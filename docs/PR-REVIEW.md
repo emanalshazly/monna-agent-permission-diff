@@ -43,6 +43,8 @@ Local tests: 40 pass, including eight PR-specific scenarios. These cover automat
 
 The installed workflow also saves the value-free Markdown report as a 14-day artifact, even when the review gate fails. Artifact download requires GitHub sign-in. Source paths remain visible. No source configuration file is uploaded as an artifact.
 
+Verified artifact delivery: [run 34079623177](https://github.com/emanalshazly/monna-agent-permission-diff/actions/runs/34079623177) uploaded `permission-review-report` successfully despite the expected review failure. The artifact was downloaded and read: it contains ALLOW_ADDED at head line 3 and MODE_CHANGED at head line 4, each with source links, a reason and an action. Base/head were extracted automatically. The red review check is intentional for this synthetic fixture; it is not a failed test of the integration.
+
 ## Next user evidence
 
 The next useful pilot is a consenting maintainer's real PR: record whether each finding was relevant, whether it changed their decision, and how long review took with and without this report. Until then, usefulness and time savings remain unverified. The present pilot specifically exposes weak guidance for plugin/hook/provider-extension changes; adding another generic warning is not evidence that this gap is solved.
