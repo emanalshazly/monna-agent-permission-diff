@@ -12,6 +12,8 @@ The report gives an immutable source link, source line, change identifier, why i
 
 ## Integration requirements
 
+Copy [the complete pinned workflow](../.github/workflows/permission-review.yml) into `.github/workflows/permission-review.yml` in the repository being reviewed. No API key, input file paths or write permission is required. The reviewer is pinned to `0f0be5d4df066dec37856fbb014ac8d8a5009f0c`.
+
 Use a `pull_request` workflow, `contents: read`, full-history checkout (`fetch-depth: 0`) and Node 22+. Invoke the `pr-review` action from a reviewed immutable commit, not from the proposed checkout. Never use `pull_request_target` with untrusted code. The runner rejects that event.
 
 The event's base/head SHAs are read automatically. A single merge base must be available; shallow or ambiguous history fails visibly. There is no fallback to comparing the wrong branch tip. Missing objects, invalid UTF-8/JSON, symlinks, oversized files and more than 100 recognized changed configs cannot produce a clean gate.
