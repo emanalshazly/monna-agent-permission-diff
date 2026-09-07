@@ -14,4 +14,14 @@
 
 The benchmark's ten authored fixtures are transparent engineering checks, not independent evidence of superiority. Keep this distinction in announcements.
 
-Recorded 2026-09-07: 32 local tests pass. SARIF structure and locations tested; external schema validation unverified. No packet-capture or independent audit claim. See [release notes](RELEASE-v0.1.0.md).
+Recorded 2026-09-07: 32 local tests pass. No packet-capture or independent audit claim. See [release notes](RELEASE-v0.1.0.md).
+
+## Follow-up: official SARIF schema validation
+
+PASS on 2026-09-07: five generated reports (empty, permission expansion, partial coverage, server addition and endpoint change) validate against the [official OASIS SARIF 2.1.0 schema](https://github.com/oasis-tcs/sarif-spec/blob/ed71d4f62db866ce3698a08a5ec3f7f2e775545d/sarif-2.1/schema/sarif-schema-2.1.0.json). An invalid-version negative control is rejected.
+
+Schema SHA-256: `c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682e`. Validator: Python `jsonschema==4.23.0`, `Draft4Validator` with `FormatChecker`.
+
+Reproduce with `python benchmark/validate-sarif.py` in an isolated environment containing `jsonschema==4.23.0` and Node on PATH. This optional maintainer audit downloads the public pinned schema and verifies its digest. It sends no configuration data. Normal product use remains dependency-installation-free and performs no analysis network requests.
+
+This follow-up closes the schema-validation gap recorded in the original v0.1.0 release notes. It does not prove all SARIF semantic requirements, GitHub ingestion, security effectiveness or market superiority. The five cases are authored tests, not an independent audit.
