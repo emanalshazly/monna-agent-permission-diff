@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": ["Read(./docs/**)"],
+    "deny": ["Read(./.env)"],
+    "ask": ["Bash"],
+    "additionalDirectories": ["/project/docs"],
+    "defaultMode": "default"
+  }
+}

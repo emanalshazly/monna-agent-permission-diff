@@ -1,0 +1,33 @@
+name: MONNA Agent Permission Diff
+description: Review agent permission changes without running MCP servers or sending configuration data away.
+branding:
+  icon: shield
+  color: green
+inputs:
+  before:
+    description: Before JSON path, relative to the workspace
+    required: true
+  after:
+    description: After JSON path, relative to the workspace
+    required: true
+  type:
+    description: auto, claude-settings or mcp
+    default: auto
+  fail-on:
+    description: Minimum finding severity that fails the step
+    default: high
+outputs:
+  report-path:
+    description: Path to redacted Markdown report
+    value: ${{ steps.diff.outputs.report-path }}
+runs:
+  using: composite
+  steps:
+    - id: diff
+      shell: bash
+      env:
+        MONNA_BEFORE: ${{ inputs.before }}
+        MONNA_AFTER: ${{ inputs.after }}
+        MONNA_FORMAT: ${{ inputs.type }}
+        MONNA_FAIL_ON: ${{ inputs.fail-on }}
+      run: node "$GITHUB_ACTION_PATH/action-runner.mjs"
