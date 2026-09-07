@@ -45,6 +45,8 @@ Strict UTF-8 JSON only: no JSONC, comments or trailing commas. Duplicate keys, n
 
 ## GitHub Action
 
+**Automatic PR mode:** see [PR review setup and measured limitations](docs/PR-REVIEW.md). It discovers changed configuration files and extracts both revisions automatically, with source links, review reasons and suggested actions. The two-file action below remains available for manual comparisons.
+
 Use a reviewed commit SHA instead of a moving branch in production. Prepare `before.json` from the trusted base revision and `after.json` from the proposed change. Keep both files inside the workspace. The Action does not retrieve revisions or guess the base. Use `pull_request`, not privileged `pull_request_target`, for untrusted contribution code.
 
 ```yaml

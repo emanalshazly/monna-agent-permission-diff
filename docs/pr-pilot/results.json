@@ -1,0 +1,48 @@
+{
+  "scope": "Two selected public commits known to touch Claude settings; retrospective compatibility/actionability evidence, not an independently labeled security or time-saved study.",
+  "records": [
+    {
+      "repository": "affaan-m/everything-claude-code",
+      "base": "d0e5caebd4fb0afe867cdc2e35c27f80f6aef6b4",
+      "head": "e85bc5fe8765dffb3609c311b3af93060685c00c",
+      "commit_url": "https://github.com/affaan-m/everything-claude-code/commit/e85bc5fe8765dffb3609c311b3af93060685c00c",
+      "elapsed_ms": 388.3924999999999,
+      "changedFileCount": 3,
+      "recognizedConfigFiles": 1,
+      "findings": 2,
+      "verdict": "review_required",
+      "files": [
+        {
+          "path": ".claude/settings.json",
+          "status": "compared",
+          "coverage": "partial",
+          "codes": [
+            "UNMODELED_CHANGE",
+            "UNMODELED_CHANGE"
+          ]
+        }
+      ]
+    },
+    {
+      "repository": "modelcontextprotocol/inspector",
+      "base": "dd46acba8710eaaa244fba9fe99e980aca5ed9ce",
+      "head": "961dc283fcd15fb0960546ae29cbdfa540437e1a",
+      "commit_url": "https://github.com/modelcontextprotocol/inspector/commit/961dc283fcd15fb0960546ae29cbdfa540437e1a",
+      "elapsed_ms": 509.45970000000034,
+      "changedFileCount": 53,
+      "recognizedConfigFiles": 1,
+      "findings": 1,
+      "verdict": "review_required",
+      "files": [
+        {
+          "path": ".claude/settings.json",
+          "status": "compared",
+          "coverage": "partial",
+          "codes": [
+            "UNMODELED_CHANGE"
+          ]
+        }
+      ]
+    }
+  ]
+}

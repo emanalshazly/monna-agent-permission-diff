@@ -1,0 +1,21 @@
+name: MONNA Agent Permission PR Review
+description: Automatically compare PR configuration changes with source evidence and review actions.
+inputs:
+  fail-on:
+    description: Minimum finding severity for review failure (medium recommended)
+    default: medium
+outputs:
+  report-path:
+    description: Markdown review report
+    value: ${{ steps.review.outputs.report-path }}
+  verdict:
+    description: Review outcome, including incomplete and no_supported_config_changes
+    value: ${{ steps.review.outputs.verdict }}
+runs:
+  using: composite
+  steps:
+    - id: review
+      shell: bash
+      env:
+        MONNA_FAIL_ON: ${{ inputs.fail-on }}
+      run: node "$GITHUB_ACTION_PATH/../pr-runner.mjs"
