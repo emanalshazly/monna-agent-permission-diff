@@ -35,7 +35,13 @@ Across these two commits, discovery narrowed 56 changed files to 2 configuration
 
 [Raw pilot metrics](pr-pilot/results.json), [first review](pr-pilot/affaan-m--everything-claude-code.md), [second review](pr-pilot/modelcontextprotocol--inspector.md). Reproduce with `node benchmark/pr-history-pilot.mjs`; it fetches the pinned public history into fresh temporary bare repositories and never executes project code or contacts their maintainers.
 
-Local tests: 40 pass, including eight PR-specific scenarios. These cover automatic discovery, additions/deletions, merge-base divergence, invalid/unsupported input, rename behavior, unsafe refs, source-link escaping, summary output, and privileged-event refusal. Hosted evidence is recorded separately after the integration run.
+Local tests: 40 pass, including eight PR-specific scenarios. These cover automatic discovery, additions/deletions, merge-base divergence, invalid/unsupported input, rename behavior, unsafe refs, source-link escaping, summary output, and privileged-event refusal.
+
+## Live integration evidence
+
+[Synthetic draft PR #1](https://github.com/emanalshazly/monna-agent-permission-diff/pull/1) exercised automatic discovery on GitHub. [Run 34079470067](https://github.com/emanalshazly/monna-agent-permission-diff/actions/runs/34079470067) returned `review_required` and exit 1 as expected for the deliberately added allow rule and bypass mode. [The six-platform/runtime jobs passed](https://github.com/emanalshazly/monna-agent-permission-diff/actions/runs/34079469987). The draft is marked do-not-merge; this is our own integration fixture, not an independent customer pilot.
+
+The installed workflow also saves the value-free Markdown report as a 14-day artifact, even when the review gate fails. Artifact download requires GitHub sign-in. Source paths remain visible. No source configuration file is uploaded as an artifact.
 
 ## Next user evidence
 
