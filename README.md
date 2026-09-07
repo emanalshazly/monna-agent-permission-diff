@@ -2,6 +2,8 @@
 
 **Review what changed in your agent's declared permissions before you merge.**
 
+[Try the public demo](https://emanalshazly.github.io/monna-agent-permission-diff/) · [Quality gates](docs/QUALITY.md)
+
 Local CLI, in-browser demo and GitHub Action. No API key, model, telemetry, external dependency installation or MCP server execution. Reports reference exact source lines and omit all configuration values.
 
 This project is a configuration-change reviewer, not a security scanner or an effective-permission evaluator. It is designed to complement tools such as MCP Inspector and Agent Scan.
@@ -50,7 +52,7 @@ permissions:
   contents: read
 steps:
   # First check out your repository and prepare before.json / after.json.
-  - uses: emanalshazly/monna-agent-permission-diff@main
+  - uses: emanalshazly/monna-agent-permission-diff@e3e7ca3c8d363c08707e1020fc67acae244ce700
     with:
       before: before.json
       after: after.json
@@ -65,6 +67,8 @@ The action needs Node 22+ on the runner. It adds the redacted report to the job 
 The root `index.html` and ES modules are a static site with English/Arabic controls. Run `node preview.mjs` and open `http://127.0.0.1:8432`, or use any static HTTP server; opening the HTML via `file://` may block module imports. Select local files or paste JSON, then compare. Files are read using the browser File API and are not uploaded. Initial site assets are fetched normally; analysis itself makes no network calls. Findings retain stable English rule identifiers and descriptions.
 
 ## Verification and comparison
+
+Browser export buttons also reveal copyable report text. Automated browser checks did not confirm a completed file download; use the text fallback or CLI output if downloads are blocked.
 
 ```sh
 node --test

@@ -1,6 +1,7 @@
 {
   "name": "monna-agent-permission-diff",
   "version": "0.1.0",
+  "license": "MIT",
   "description": "Offline, evidence-linked review of permission changes in Claude settings and MCP configurations.",
   "type": "module",
   "bin": { "monna-permission-diff": "cli.mjs" },
