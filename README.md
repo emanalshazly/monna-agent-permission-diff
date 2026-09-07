@@ -68,6 +68,8 @@ The root `index.html` and ES modules are a static site with English/Arabic contr
 
 ## Verification and comparison
 
+Read the [executed three-alternative comparison](docs/THREE-ALTERNATIVE-REVIEW.md), including pinned competitor versions, synthetic fixtures, raw results and competitor strengths. These scoped checks are not an overall security ranking.
+
 Browser export buttons also reveal copyable report text. Automated browser checks did not confirm a completed file download; use the text fallback or CLI output if downloads are blocked.
 
 ```sh

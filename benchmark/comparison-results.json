@@ -1,0 +1,1746 @@
+{
+  "scope": "First-party synthetic library-level change-signal checks; not a security accuracy ranking or CLI/user study. mcp-diff uses separate manifest cases; not ranked on unsupported config input.",
+  "versions": {
+    "agent-permission-diff": "77b8fae90e0662633ae471636ee13eec9f785e83",
+    "mcp-diff": "b1a044e40d77e8a5d53c2dbc679514a0aaccaafc",
+    "agentdrift": "e4564d11d4f1f3fb822fc9275298e5eea5dbd6c0"
+  },
+  "runtime": "v24.20.0",
+  "fixtures": [
+    [
+      "write-added",
+      {
+        "permissions": {}
+      },
+      {
+        "permissions": {
+          "allow": [
+            "Write(src/**)"
+          ]
+        }
+      },
+      true
+    ],
+    [
+      "deny-removed",
+      {
+        "permissions": {
+          "deny": [
+            "Read(.env)"
+          ]
+        }
+      },
+      {
+        "permissions": {}
+      },
+      true
+    ],
+    [
+      "ask-removed",
+      {
+        "permissions": {
+          "ask": [
+            "Bash"
+          ]
+        }
+      },
+      {
+        "permissions": {}
+      },
+      true
+    ],
+    [
+      "bypass-enabled",
+      {
+        "permissions": {
+          "defaultMode": "default"
+        }
+      },
+      {
+        "permissions": {
+          "defaultMode": "bypassPermissions"
+        }
+      },
+      true
+    ],
+    [
+      "directory-added",
+      {
+        "permissions": {
+          "additionalDirectories": []
+        }
+      },
+      {
+        "permissions": {
+          "additionalDirectories": [
+            "/project"
+          ]
+        }
+      },
+      true
+    ],
+    [
+      "mcp-added",
+      {
+        "mcpServers": {}
+      },
+      {
+        "mcpServers": {
+          "demo": {
+            "command": "node"
+          }
+        }
+      },
+      true
+    ],
+    [
+      "arguments-reordered",
+      {
+        "mcpServers": {
+          "demo": {
+            "command": "node",
+            "args": [
+              "a",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "mcpServers": {
+          "demo": {
+            "command": "node",
+            "args": [
+              "b",
+              "a"
+            ]
+          }
+        }
+      },
+      true
+    ],
+    [
+      "environment-rotated",
+      {
+        "mcpServers": {
+          "demo": {
+            "command": "node",
+            "env": {
+              "TOKEN": "old"
+            }
+          }
+        }
+      },
+      {
+        "mcpServers": {
+          "demo": {
+            "command": "node",
+            "env": {
+              "TOKEN": "MONNA_SYNTHETIC_CREDENTIAL_NOT_REAL_4827"
+            }
+          }
+        }
+      },
+      true
+    ],
+    [
+      "endpoint-changed",
+      {
+        "mcpServers": {
+          "demo": {
+            "url": "https://example.invalid/a"
+          }
+        }
+      },
+      {
+        "mcpServers": {
+          "demo": {
+            "url": "https://example.invalid/b?token=MONNA_SYNTHETIC_CREDENTIAL_NOT_REAL_4827"
+          }
+        }
+      },
+      true
+    ],
+    [
+      "unknown-changed",
+      {
+        "permissions": {
+          "futurePolicy": "restricted"
+        }
+      },
+      {
+        "permissions": {
+          "futurePolicy": "open"
+        }
+      },
+      true
+    ],
+    [
+      "deny-added",
+      {
+        "permissions": {}
+      },
+      {
+        "permissions": {
+          "deny": [
+            "Bash"
+          ]
+        }
+      },
+      true
+    ],
+    [
+      "identical",
+      {
+        "permissions": {
+          "allow": [
+            "Read",
+            "Bash"
+          ]
+        }
+      },
+      {
+        "permissions": {
+          "allow": [
+            "Read",
+            "Bash"
+          ]
+        }
+      },
+      false
+    ],
+    [
+      "set-reordered",
+      {
+        "permissions": {
+          "allow": [
+            "Read",
+            "Bash"
+          ]
+        }
+      },
+      {
+        "permissions": {
+          "allow": [
+            "Bash",
+            "Read"
+          ]
+        }
+      },
+      false
+    ],
+    [
+      "object-reordered",
+      {
+        "mcpServers": {
+          "demo": {
+            "command": "node",
+            "env": {
+              "A": "a",
+              "B": "b"
+            }
+          }
+        }
+      },
+      {
+        "mcpServers": {
+          "demo": {
+            "env": {
+              "B": "b",
+              "A": "a"
+            },
+            "command": "node"
+          }
+        }
+      },
+      false
+    ]
+  ],
+  "totals": {
+    "monna": {
+      "matches": 14,
+      "total": 14,
+      "changed_signaled": 11,
+      "changed_total": 11,
+      "benign_signaled": 0,
+      "benign_total": 3
+    },
+    "apd": {
+      "matches": 7,
+      "total": 14,
+      "changed_signaled": 4,
+      "changed_total": 11,
+      "benign_signaled": 0,
+      "benign_total": 3
+    },
+    "agentdrift": {
+      "matches": 7,
+      "total": 14,
+      "changed_signaled": 4,
+      "changed_total": 11,
+      "benign_signaled": 0,
+      "benign_total": 3
+    }
+  },
+  "rows": [
+    {
+      "name": "write-added",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": false
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "ALLOW_ADDED",
+              "severity": "high",
+              "direction": "potential_expansion",
+              "message": "An entry was added. Review the cited source; values are omitted from reports.",
+              "evidence": {
+                "before": {
+                  "line": 2,
+                  "column": 18
+                },
+                "after": {
+                  "line": 4,
+                  "column": 7
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [
+          {
+            "id": "APD001",
+            "kind": "broadened",
+            "severity": "high",
+            "agent": "claude",
+            "category": "write",
+            "key": "permissions.allow",
+            "to": "Write(src/**)",
+            "source": "<SYNTHETIC_ROOT>\\write-added\\.claude\\settings.json",
+            "message": "New write capability: Write(src/**)"
+          }
+        ],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"ALLOW_ADDED\",\"severity\":\"high\",\"direction\":\"potential_expansion\",\"message\":\"An entry was added. Review the cited source; values are omitted from reports.\",\"evidence\":{\"before\":{\"line\":2,\"column\":18},\"after\":{\"line\":4,\"column\":7}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · claude-settings · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| ALLOW_ADDED | high | 2 | 4 | An entry was added. Review the cited source; values are omitted from reports. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"ALLOW_ADDED\",\"shortDescription\":{\"text\":\"ALLOW_ADDED\"}}]}},\"results\":[{\"ruleId\":\"ALLOW_ADDED\",\"level\":\"error\",\"message\":{\"text\":\"An entry was added. Review the cited source; values are omitted from reports.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":4,\"startColumn\":7}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":2,\"startColumn\":18}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\write-added\",\n    \"generatedAt\": \"2026-09-07T02:57:08.169Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"write\",\n        \"key\": \"permissions.allow\",\n        \"value\": \"Write(src/**)\",\n        \"rank\": 4,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\write-added\\\\.claude\\\\settings.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\write-added\\\\.claude\\\\settings.json#permissions.allow\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": [\n    {\n      \"id\": \"APD001\",\n      \"kind\": \"broadened\",\n      \"severity\": \"high\",\n      \"agent\": \"claude\",\n      \"category\": \"write\",\n      \"key\": \"permissions.allow\",\n      \"to\": \"Write(src/**)\",\n      \"source\": \"<SYNTHETIC_ROOT>\\\\write-added\\\\.claude\\\\settings.json\",\n      \"message\": \"New write capability: Write(src/**)\"\n    }\n  ]\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 1\n- Changes: 1\n\n1. **APD001** (high) claude/write:permissions.allow - New write capability: Write(src/**)\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": [\n        {\n          \"ruleId\": \"APD001\",\n          \"level\": \"error\",\n          \"message\": {\n            \"text\": \"claude/write:permissions.allow - New write capability: Write(src/**)\"\n          },\n          \"locations\": [\n            {\n              \"physicalLocation\": {\n                \"artifactLocation\": {\n                  \"uri\": \"<SYNTHETIC_ROOT>\\\\write-added\\\\.claude\\\\settings.json\"\n                }\n              }\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "deny-removed",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": true
+      },
+      "matches": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": true
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "DENY_REMOVED",
+              "severity": "high",
+              "direction": "potential_expansion",
+              "message": "An entry was removed. Review the cited source; values are omitted from reports.",
+              "evidence": {
+                "before": {
+                  "line": 4,
+                  "column": 7
+                },
+                "after": {
+                  "line": 2,
+                  "column": 18
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": [
+          {
+            "rule_id": "AD012",
+            "severity": "medium",
+            "message": "Tool/command restriction removed: access restriction removed",
+            "file": ".claude/settings.json",
+            "commit": "synthetic",
+            "commit_date": "2026-09-07",
+            "author": "synthetic",
+            "line": "\"deny\": [",
+            "change_type": "removed"
+          }
+        ]
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"DENY_REMOVED\",\"severity\":\"high\",\"direction\":\"potential_expansion\",\"message\":\"An entry was removed. Review the cited source; values are omitted from reports.\",\"evidence\":{\"before\":{\"line\":4,\"column\":7},\"after\":{\"line\":2,\"column\":18}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · claude-settings · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| DENY_REMOVED | high | 4 | 2 | An entry was removed. Review the cited source; values are omitted from reports. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"DENY_REMOVED\",\"shortDescription\":{\"text\":\"DENY_REMOVED\"}}]}},\"results\":[{\"ruleId\":\"DENY_REMOVED\",\"level\":\"error\",\"message\":{\"text\":\"An entry was removed. Review the cited source; values are omitted from reports.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":2,\"startColumn\":18}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":4,\"startColumn\":7}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\deny-removed\",\n    \"generatedAt\": \"2026-09-07T02:57:08.694Z\",\n    \"permissions\": [],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 0\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[{\"rule_id\": \"AD012\", \"severity\": \"medium\", \"message\": \"Tool/command restriction removed: access restriction removed\", \"file\": \".claude/settings.json\", \"commit\": \"synthetic\", \"commit_date\": \"2026-09-07\", \"author\": \"synthetic\", \"line\": \"\\\"deny\\\": [\", \"change_type\": \"removed\"}]\r\n"
+        }
+      }
+    },
+    {
+      "name": "ask-removed",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "ASK_REMOVED",
+              "severity": "high",
+              "direction": "potential_expansion",
+              "message": "An entry was removed. Review the cited source; values are omitted from reports.",
+              "evidence": {
+                "before": {
+                  "line": 4,
+                  "column": 7
+                },
+                "after": {
+                  "line": 2,
+                  "column": 18
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"ASK_REMOVED\",\"severity\":\"high\",\"direction\":\"potential_expansion\",\"message\":\"An entry was removed. Review the cited source; values are omitted from reports.\",\"evidence\":{\"before\":{\"line\":4,\"column\":7},\"after\":{\"line\":2,\"column\":18}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · claude-settings · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| ASK_REMOVED | high | 4 | 2 | An entry was removed. Review the cited source; values are omitted from reports. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"ASK_REMOVED\",\"shortDescription\":{\"text\":\"ASK_REMOVED\"}}]}},\"results\":[{\"ruleId\":\"ASK_REMOVED\",\"level\":\"error\",\"message\":{\"text\":\"An entry was removed. Review the cited source; values are omitted from reports.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":2,\"startColumn\":18}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":4,\"startColumn\":7}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\ask-removed\",\n    \"generatedAt\": \"2026-09-07T02:57:09.195Z\",\n    \"permissions\": [],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 0\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "bypass-enabled",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "MODE_CHANGED",
+              "severity": "critical",
+              "direction": "review",
+              "message": "Default permission mode changed. Effective behavior also depends on managed settings and runtime flags.",
+              "evidence": {
+                "before": {
+                  "line": 3,
+                  "column": 20
+                },
+                "after": {
+                  "line": 3,
+                  "column": 20
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"MODE_CHANGED\",\"severity\":\"critical\",\"direction\":\"review\",\"message\":\"Default permission mode changed. Effective behavior also depends on managed settings and runtime flags.\",\"evidence\":{\"before\":{\"line\":3,\"column\":20},\"after\":{\"line\":3,\"column\":20}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · claude-settings · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| MODE_CHANGED | critical | 3 | 3 | Default permission mode changed. Effective behavior also depends on managed settings and runtime flags. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"MODE_CHANGED\",\"shortDescription\":{\"text\":\"MODE_CHANGED\"}}]}},\"results\":[{\"ruleId\":\"MODE_CHANGED\",\"level\":\"error\",\"message\":{\"text\":\"Default permission mode changed. Effective behavior also depends on managed settings and runtime flags.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":3,\"startColumn\":20}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":3,\"startColumn\":20}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\bypass-enabled\",\n    \"generatedAt\": \"2026-09-07T02:57:09.714Z\",\n    \"permissions\": [],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 0\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "directory-added",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "DIRECTORY_ADDED",
+              "severity": "high",
+              "direction": "potential_expansion",
+              "message": "An entry was added. Review the cited source; values are omitted from reports.",
+              "evidence": {
+                "before": {
+                  "line": 3,
+                  "column": 30
+                },
+                "after": {
+                  "line": 4,
+                  "column": 7
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"DIRECTORY_ADDED\",\"severity\":\"high\",\"direction\":\"potential_expansion\",\"message\":\"An entry was added. Review the cited source; values are omitted from reports.\",\"evidence\":{\"before\":{\"line\":3,\"column\":30},\"after\":{\"line\":4,\"column\":7}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · claude-settings · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| DIRECTORY_ADDED | high | 3 | 4 | An entry was added. Review the cited source; values are omitted from reports. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"DIRECTORY_ADDED\",\"shortDescription\":{\"text\":\"DIRECTORY_ADDED\"}}]}},\"results\":[{\"ruleId\":\"DIRECTORY_ADDED\",\"level\":\"error\",\"message\":{\"text\":\"An entry was added. Review the cited source; values are omitted from reports.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":4,\"startColumn\":7}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":3,\"startColumn\":30}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\directory-added\",\n    \"generatedAt\": \"2026-09-07T02:57:10.158Z\",\n    \"permissions\": [],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 0\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "mcp-added",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": true
+      },
+      "matches": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": true
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "mcp",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "SERVER_ADDED",
+              "severity": "high",
+              "direction": "potential_expansion",
+              "message": "A server configuration was added. This does not prove which tools or permissions it exposes.",
+              "evidence": {
+                "before": {
+                  "line": 2,
+                  "column": 17
+                },
+                "after": {
+                  "line": 3,
+                  "column": 13
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [
+          {
+            "id": "APD007",
+            "kind": "broadened",
+            "severity": "review",
+            "agent": "claude",
+            "category": "mcp",
+            "key": "mcpServers.demo",
+            "to": "node",
+            "source": "<SYNTHETIC_ROOT>\\mcp-added\\.mcp.json",
+            "message": "New MCP executable surface: node"
+          }
+        ],
+        "agentdrift": [
+          {
+            "rule_id": "AD007",
+            "severity": "high",
+            "message": "MCP server change: mcpServers configuration block",
+            "file": ".mcp.json",
+            "commit": "synthetic",
+            "commit_date": "2026-09-07",
+            "author": "synthetic",
+            "line": "\"mcpServers\": {",
+            "change_type": "added"
+          }
+        ]
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"mcp\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"SERVER_ADDED\",\"severity\":\"high\",\"direction\":\"potential_expansion\",\"message\":\"A server configuration was added. This does not prove which tools or permissions it exposes.\",\"evidence\":{\"before\":{\"line\":2,\"column\":17},\"after\":{\"line\":3,\"column\":13}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · mcp · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| SERVER_ADDED | high | 2 | 3 | A server configuration was added. This does not prove which tools or permissions it exposes. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"SERVER_ADDED\",\"shortDescription\":{\"text\":\"SERVER_ADDED\"}}]}},\"results\":[{\"ruleId\":\"SERVER_ADDED\",\"level\":\"error\",\"message\":{\"text\":\"A server configuration was added. This does not prove which tools or permissions it exposes.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":3,\"startColumn\":13}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":2,\"startColumn\":17}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\mcp-added\",\n    \"generatedAt\": \"2026-09-07T02:57:10.629Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"mcp\",\n        \"key\": \"mcpServers.demo\",\n        \"value\": \"node\",\n        \"rank\": 3,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\mcp-added\\\\.mcp.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\mcp-added\\\\.mcp.json#mcpServers.demo\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": [\n    {\n      \"id\": \"APD007\",\n      \"kind\": \"broadened\",\n      \"severity\": \"review\",\n      \"agent\": \"claude\",\n      \"category\": \"mcp\",\n      \"key\": \"mcpServers.demo\",\n      \"to\": \"node\",\n      \"source\": \"<SYNTHETIC_ROOT>\\\\mcp-added\\\\.mcp.json\",\n      \"message\": \"New MCP executable surface: node\"\n    }\n  ]\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 1\n- Changes: 1\n\n1. **APD007** (review) claude/mcp:mcpServers.demo - New MCP executable surface: node\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": [\n        {\n          \"ruleId\": \"APD007\",\n          \"level\": \"warning\",\n          \"message\": {\n            \"text\": \"claude/mcp:mcpServers.demo - New MCP executable surface: node\"\n          },\n          \"locations\": [\n            {\n              \"physicalLocation\": {\n                \"artifactLocation\": {\n                  \"uri\": \"<SYNTHETIC_ROOT>\\\\mcp-added\\\\.mcp.json\"\n                }\n              }\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[{\"rule_id\": \"AD007\", \"severity\": \"high\", \"message\": \"MCP server change: mcpServers configuration block\", \"file\": \".mcp.json\", \"commit\": \"synthetic\", \"commit_date\": \"2026-09-07\", \"author\": \"synthetic\", \"line\": \"\\\"mcpServers\\\": {\", \"change_type\": \"added\"}]\r\n"
+        }
+      }
+    },
+    {
+      "name": "arguments-reordered",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "mcp",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "ARGUMENTS_CHANGED",
+              "severity": "high",
+              "direction": "review",
+              "message": "Server arguments changed. Arguments can alter execution or access scope; values are withheld.",
+              "evidence": {
+                "before": {
+                  "line": 5,
+                  "column": 15
+                },
+                "after": {
+                  "line": 5,
+                  "column": 15
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"mcp\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"ARGUMENTS_CHANGED\",\"severity\":\"high\",\"direction\":\"review\",\"message\":\"Server arguments changed. Arguments can alter execution or access scope; values are withheld.\",\"evidence\":{\"before\":{\"line\":5,\"column\":15},\"after\":{\"line\":5,\"column\":15}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · mcp · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| ARGUMENTS_CHANGED | high | 5 | 5 | Server arguments changed. Arguments can alter execution or access scope; values are withheld. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"ARGUMENTS_CHANGED\",\"shortDescription\":{\"text\":\"ARGUMENTS_CHANGED\"}}]}},\"results\":[{\"ruleId\":\"ARGUMENTS_CHANGED\",\"level\":\"error\",\"message\":{\"text\":\"Server arguments changed. Arguments can alter execution or access scope; values are withheld.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":5,\"startColumn\":15}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":5,\"startColumn\":15}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\arguments-reordered\",\n    \"generatedAt\": \"2026-09-07T02:57:11.038Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"mcp\",\n        \"key\": \"mcpServers.demo\",\n        \"value\": \"node\",\n        \"rank\": 3,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\arguments-reordered\\\\.mcp.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\arguments-reordered\\\\.mcp.json#mcpServers.demo\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 1\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "environment-rotated",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": false
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "mcp",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "ENVIRONMENT_CHANGED",
+              "severity": "medium",
+              "direction": "review",
+              "message": "Environment configuration changed; all values are withheld, including credentials.",
+              "evidence": {
+                "before": {
+                  "line": 5,
+                  "column": 14
+                },
+                "after": {
+                  "line": 5,
+                  "column": 14
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"mcp\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"ENVIRONMENT_CHANGED\",\"severity\":\"medium\",\"direction\":\"review\",\"message\":\"Environment configuration changed; all values are withheld, including credentials.\",\"evidence\":{\"before\":{\"line\":5,\"column\":14},\"after\":{\"line\":5,\"column\":14}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · mcp · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| ENVIRONMENT_CHANGED | medium | 5 | 5 | Environment configuration changed; all values are withheld, including credentials. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"ENVIRONMENT_CHANGED\",\"shortDescription\":{\"text\":\"ENVIRONMENT_CHANGED\"}}]}},\"results\":[{\"ruleId\":\"ENVIRONMENT_CHANGED\",\"level\":\"warning\",\"message\":{\"text\":\"Environment configuration changed; all values are withheld, including credentials.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":5,\"startColumn\":14}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":5,\"startColumn\":14}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\environment-rotated\",\n    \"generatedAt\": \"2026-09-07T02:57:11.497Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"mcp\",\n        \"key\": \"mcpServers.demo\",\n        \"value\": \"node\",\n        \"rank\": 3,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\environment-rotated\\\\.mcp.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\environment-rotated\\\\.mcp.json#mcpServers.demo\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 1\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "endpoint-changed",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": true
+      },
+      "matches": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": true
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": true,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": true
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "mcp",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "ENDPOINT_CHANGED",
+              "severity": "high",
+              "direction": "review",
+              "message": "The remote endpoint changed. Endpoint trust and authorization need review; URL values are withheld.",
+              "evidence": {
+                "before": {
+                  "line": 4,
+                  "column": 14
+                },
+                "after": {
+                  "line": 4,
+                  "column": 14
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [
+          {
+            "id": "APD010",
+            "kind": "unknown",
+            "severity": "info",
+            "agent": "claude",
+            "category": "mcp",
+            "key": "mcpServers.demo",
+            "from": "https://example.invalid/a",
+            "to": "https://example.invalid/b?token=MONNA_SYNTHETIC_CREDENTIAL_NOT_REAL_4827",
+            "source": "<SYNTHETIC_ROOT>\\endpoint-changed\\.mcp.json",
+            "message": "Value changed but ordering is uncertain"
+          }
+        ],
+        "agentdrift": [
+          {
+            "rule_id": "AD011",
+            "severity": "medium",
+            "message": "Network access pattern added: External URL reference",
+            "file": ".mcp.json",
+            "commit": "synthetic",
+            "commit_date": "2026-09-07",
+            "author": "synthetic",
+            "line": "\"url\": \"https://example.invalid/b?token=MONNA_SYNTHETIC_CREDENTIAL_NOT_REAL_4827\"",
+            "change_type": "added"
+          }
+        ]
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"mcp\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"ENDPOINT_CHANGED\",\"severity\":\"high\",\"direction\":\"review\",\"message\":\"The remote endpoint changed. Endpoint trust and authorization need review; URL values are withheld.\",\"evidence\":{\"before\":{\"line\":4,\"column\":14},\"after\":{\"line\":4,\"column\":14}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · mcp · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| ENDPOINT_CHANGED | high | 4 | 4 | The remote endpoint changed. Endpoint trust and authorization need review; URL values are withheld. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"ENDPOINT_CHANGED\",\"shortDescription\":{\"text\":\"ENDPOINT_CHANGED\"}}]}},\"results\":[{\"ruleId\":\"ENDPOINT_CHANGED\",\"level\":\"error\",\"message\":{\"text\":\"The remote endpoint changed. Endpoint trust and authorization need review; URL values are withheld.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":4,\"startColumn\":14}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":4,\"startColumn\":14}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\endpoint-changed\",\n    \"generatedAt\": \"2026-09-07T02:57:11.997Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"mcp\",\n        \"key\": \"mcpServers.demo\",\n        \"value\": \"https://example.invalid/b?token=MONNA_SYNTHETIC_CREDENTIAL_NOT_REAL_4827\",\n        \"rank\": 3,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\endpoint-changed\\\\.mcp.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\endpoint-changed\\\\.mcp.json#mcpServers.demo\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": [\n    {\n      \"id\": \"APD010\",\n      \"kind\": \"unknown\",\n      \"severity\": \"info\",\n      \"agent\": \"claude\",\n      \"category\": \"mcp\",\n      \"key\": \"mcpServers.demo\",\n      \"from\": \"https://example.invalid/a\",\n      \"to\": \"https://example.invalid/b?token=MONNA_SYNTHETIC_CREDENTIAL_NOT_REAL_4827\",\n      \"source\": \"<SYNTHETIC_ROOT>\\\\endpoint-changed\\\\.mcp.json\",\n      \"message\": \"Value changed but ordering is uncertain\"\n    }\n  ]\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 1\n- Changes: 1\n\n1. **APD010** (info) claude/mcp:mcpServers.demo - Value changed but ordering is uncertain\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": [\n        {\n          \"ruleId\": \"APD010\",\n          \"level\": \"note\",\n          \"message\": {\n            \"text\": \"claude/mcp:mcpServers.demo - Value changed but ordering is uncertain\"\n          },\n          \"locations\": [\n            {\n              \"physicalLocation\": {\n                \"artifactLocation\": {\n                  \"uri\": \"<SYNTHETIC_ROOT>\\\\endpoint-changed\\\\.mcp.json\"\n                }\n              }\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[{\"rule_id\": \"AD011\", \"severity\": \"medium\", \"message\": \"Network access pattern added: External URL reference\", \"file\": \".mcp.json\", \"commit\": \"synthetic\", \"commit_date\": \"2026-09-07\", \"author\": \"synthetic\", \"line\": \"\\\"url\\\": \\\"https://example.invalid/b?token=MONNA_SYNTHETIC_CREDENTIAL_NOT_REAL_4827\\\"\", \"change_type\": \"added\"}]\r\n"
+        }
+      }
+    },
+    {
+      "name": "unknown-changed",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": true
+      },
+      "matches": {
+        "monna": true,
+        "apd": false,
+        "agentdrift": true
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "review_required",
+          "findings": [
+            {
+              "code": "UNMODELED_CHANGE",
+              "severity": "medium",
+              "direction": "review",
+              "message": "An unsupported field changed. Its permission impact is unknown; inspect the cited lines.",
+              "evidence": {
+                "before": {
+                  "line": 3,
+                  "column": 21
+                },
+                "after": {
+                  "line": 3,
+                  "column": 21
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "partial",
+            "unsupported_fields": [
+              {
+                "status": "unsupported",
+                "evidence": {
+                  "before": {
+                    "line": 3,
+                    "column": 21
+                  },
+                  "after": {
+                    "line": 3,
+                    "column": 21
+                  }
+                }
+              }
+            ]
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": [
+          {
+            "rule_id": "AD012",
+            "severity": "medium",
+            "message": "Tool/command restriction removed: access restriction removed",
+            "file": ".claude/settings.json",
+            "commit": "synthetic",
+            "commit_date": "2026-09-07",
+            "author": "synthetic",
+            "line": "\"futurePolicy\": \"restricted\"",
+            "change_type": "removed"
+          }
+        ]
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"review_required\",\"findings\":[{\"code\":\"UNMODELED_CHANGE\",\"severity\":\"medium\",\"direction\":\"review\",\"message\":\"An unsupported field changed. Its permission impact is unknown; inspect the cited lines.\",\"evidence\":{\"before\":{\"line\":3,\"column\":21},\"after\":{\"line\":3,\"column\":21}}}],\"coverage\":{\"status\":\"partial\",\"unsupported_fields\":[{\"status\":\"unsupported\",\"evidence\":{\"before\":{\"line\":3,\"column\":21},\"after\":{\"line\":3,\"column\":21}}}]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**review_required** · claude-settings · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| UNMODELED_CHANGE | medium | 3 | 3 | An unsupported field changed. Its permission impact is unknown; inspect the cited lines. |\n\nCoverage: partial. Unsupported fields: 1.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"UNMODELED_CHANGE\",\"shortDescription\":{\"text\":\"UNMODELED_CHANGE\"}}]}},\"results\":[{\"ruleId\":\"UNMODELED_CHANGE\",\"level\":\"warning\",\"message\":{\"text\":\"An unsupported field changed. Its permission impact is unknown; inspect the cited lines.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":3,\"startColumn\":21}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":3,\"startColumn\":21}}}]}],\"properties\":{\"coverage\":\"partial\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\unknown-changed\",\n    \"generatedAt\": \"2026-09-07T02:57:12.523Z\",\n    \"permissions\": [],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 0\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[{\"rule_id\": \"AD012\", \"severity\": \"medium\", \"message\": \"Tool/command restriction removed: access restriction removed\", \"file\": \".claude/settings.json\", \"commit\": \"synthetic\", \"commit_date\": \"2026-09-07\", \"author\": \"synthetic\", \"line\": \"\\\"futurePolicy\\\": \\\"restricted\\\"\", \"change_type\": \"removed\"}]\r\n"
+        }
+      }
+    },
+    {
+      "name": "deny-added",
+      "expected": true,
+      "signals": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": false
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "no_review_level_change_detected",
+          "findings": [
+            {
+              "code": "DENY_ADDED",
+              "severity": "info",
+              "direction": "potential_reduction",
+              "message": "An entry was added. Review the cited source; values are omitted from reports.",
+              "evidence": {
+                "before": {
+                  "line": 2,
+                  "column": 18
+                },
+                "after": {
+                  "line": 4,
+                  "column": 7
+                }
+              }
+            }
+          ],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [
+          {
+            "id": "APD003",
+            "kind": "broadened",
+            "severity": "review",
+            "agent": "claude",
+            "category": "shell",
+            "key": "permissions.deny",
+            "to": "Bash",
+            "source": "<SYNTHETIC_ROOT>\\deny-added\\.claude\\settings.json",
+            "message": "New shell grant: Bash"
+          }
+        ],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"no_review_level_change_detected\",\"findings\":[{\"code\":\"DENY_ADDED\",\"severity\":\"info\",\"direction\":\"potential_reduction\",\"message\":\"An entry was added. Review the cited source; values are omitted from reports.\",\"evidence\":{\"before\":{\"line\":2,\"column\":18},\"after\":{\"line\":4,\"column\":7}}}],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**no_review_level_change_detected** · claude-settings · 1 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n| DENY_ADDED | info | 2 | 4 | An entry was added. Review the cited source; values are omitted from reports. |\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[{\"id\":\"DENY_ADDED\",\"shortDescription\":{\"text\":\"DENY_ADDED\"}}]}},\"results\":[{\"ruleId\":\"DENY_ADDED\",\"level\":\"note\",\"message\":{\"text\":\"An entry was added. Review the cited source; values are omitted from reports.\"},\"locations\":[{\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"after.json\"},\"region\":{\"startLine\":4,\"startColumn\":7}}}],\"relatedLocations\":[{\"id\":1,\"message\":{\"text\":\"Before configuration\"},\"physicalLocation\":{\"artifactLocation\":{\"uri\":\"before.json\"},\"region\":{\"startLine\":2,\"startColumn\":18}}}]}],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\deny-added\",\n    \"generatedAt\": \"2026-09-07T02:57:13.069Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"shell\",\n        \"key\": \"permissions.deny\",\n        \"value\": \"Bash\",\n        \"rank\": 0,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\deny-added\\\\.claude\\\\settings.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\deny-added\\\\.claude\\\\settings.json#permissions.deny\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": [\n    {\n      \"id\": \"APD003\",\n      \"kind\": \"broadened\",\n      \"severity\": \"review\",\n      \"agent\": \"claude\",\n      \"category\": \"shell\",\n      \"key\": \"permissions.deny\",\n      \"to\": \"Bash\",\n      \"source\": \"<SYNTHETIC_ROOT>\\\\deny-added\\\\.claude\\\\settings.json\",\n      \"message\": \"New shell grant: Bash\"\n    }\n  ]\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 1\n- Changes: 1\n\n1. **APD003** (review) claude/shell:permissions.deny - New shell grant: Bash\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": [\n        {\n          \"ruleId\": \"APD003\",\n          \"level\": \"warning\",\n          \"message\": {\n            \"text\": \"claude/shell:permissions.deny - New shell grant: Bash\"\n          },\n          \"locations\": [\n            {\n              \"physicalLocation\": {\n                \"artifactLocation\": {\n                  \"uri\": \"<SYNTHETIC_ROOT>\\\\deny-added\\\\.claude\\\\settings.json\"\n                }\n              }\n            }\n          ]\n        }\n      ]\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "identical",
+      "expected": false,
+      "signals": {
+        "monna": false,
+        "apd": false,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": true
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "no_review_level_change_detected",
+          "findings": [],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"no_review_level_change_detected\",\"findings\":[],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**no_review_level_change_detected** · claude-settings · 0 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n\nNo changes detected in the compared configuration fields.\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[]}},\"results\":[],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\identical\",\n    \"generatedAt\": \"2026-09-07T02:57:13.639Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"read\",\n        \"key\": \"permissions.allow\",\n        \"value\": \"Read\",\n        \"rank\": 4,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\identical\\\\.claude\\\\settings.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\identical\\\\.claude\\\\settings.json#permissions.allow\"\n      },\n      {\n        \"agent\": \"claude\",\n        \"category\": \"shell\",\n        \"key\": \"permissions.allow\",\n        \"value\": \"Bash\",\n        \"rank\": 4,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\identical\\\\.claude\\\\settings.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\identical\\\\.claude\\\\settings.json#permissions.allow\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 2\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "set-reordered",
+      "expected": false,
+      "signals": {
+        "monna": false,
+        "apd": false,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": true
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "claude-settings",
+          "verdict": "no_review_level_change_detected",
+          "findings": [],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"claude-settings\",\"verdict\":\"no_review_level_change_detected\",\"findings\":[],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**no_review_level_change_detected** · claude-settings · 0 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n\nNo changes detected in the compared configuration fields.\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[]}},\"results\":[],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\set-reordered\",\n    \"generatedAt\": \"2026-09-07T02:57:14.230Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"shell\",\n        \"key\": \"permissions.allow\",\n        \"value\": \"Bash\",\n        \"rank\": 4,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\set-reordered\\\\.claude\\\\settings.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\set-reordered\\\\.claude\\\\settings.json#permissions.allow\"\n      },\n      {\n        \"agent\": \"claude\",\n        \"category\": \"read\",\n        \"key\": \"permissions.allow\",\n        \"value\": \"Read\",\n        \"rank\": 4,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\set-reordered\\\\.claude\\\\settings.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\set-reordered\\\\.claude\\\\settings.json#permissions.allow\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 2\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    },
+    {
+      "name": "object-reordered",
+      "expected": false,
+      "signals": {
+        "monna": false,
+        "apd": false,
+        "agentdrift": false
+      },
+      "matches": {
+        "monna": true,
+        "apd": true,
+        "agentdrift": true
+      },
+      "canary_present": {
+        "monna": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "apd": {
+          "json": false,
+          "markdown": false,
+          "sarif": false
+        },
+        "agentdrift": {
+          "json": false
+        }
+      },
+      "raw": {
+        "monna": {
+          "schema_version": "1.0",
+          "tool": {
+            "name": "MONNA Agent Permission Diff",
+            "version": "0.1.0"
+          },
+          "format": "mcp",
+          "verdict": "no_review_level_change_detected",
+          "findings": [],
+          "coverage": {
+            "status": "supported_fields_only",
+            "unsupported_fields": []
+          },
+          "limitations": [
+            "Static comparison of two supplied files, not effective permission evaluation.",
+            "Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.",
+            "No server commands, hooks or tools are executed; no network requests are made.",
+            "Config values are withheld from reports. Source line locations identify evidence."
+          ]
+        },
+        "apd": [],
+        "agentdrift": []
+      },
+      "outputs": {
+        "monna": {
+          "json": "{\"schema_version\":\"1.0\",\"tool\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\"},\"format\":\"mcp\",\"verdict\":\"no_review_level_change_detected\",\"findings\":[],\"coverage\":{\"status\":\"supported_fields_only\",\"unsupported_fields\":[]},\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}",
+          "markdown": "# MONNA Agent Permission Diff\n\n**no_review_level_change_detected** · mcp · 0 findings\n\n| Rule | Severity | Before line | After line | Review |\n|---|---|---:|---:|---|\n\nNo changes detected in the compared configuration fields.\n\nCoverage: supported_fields_only. Unsupported fields: 0.\n\n- Static comparison of two supplied files, not effective permission evaluation.\n- Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\n- No server commands, hooks or tools are executed; no network requests are made.\n- Config values are withheld from reports. Source line locations identify evidence.\n\nBuilt by [MONNA](https://github.com/emanalshazly/monna-agent-permission-diff).\n",
+          "sarif": "{\"$schema\":\"https://json.schemastore.org/sarif-2.1.0.json\",\"version\":\"2.1.0\",\"runs\":[{\"tool\":{\"driver\":{\"name\":\"MONNA Agent Permission Diff\",\"version\":\"0.1.0\",\"rules\":[]}},\"results\":[],\"properties\":{\"coverage\":\"supported_fields_only\",\"limitations\":[\"Static comparison of two supplied files, not effective permission evaluation.\",\"Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.\",\"No server commands, hooks or tools are executed; no network requests are made.\",\"Config values are withheld from reports. Source line locations identify evidence.\"]}}]}"
+        },
+        "apd": {
+          "json": "{\n  \"schemaVersion\": 2,\n  \"surface\": {\n    \"schemaVersion\": 2,\n    \"cwd\": \"<SYNTHETIC_ROOT>\\\\object-reordered\",\n    \"generatedAt\": \"2026-09-07T02:57:14.816Z\",\n    \"permissions\": [\n      {\n        \"agent\": \"claude\",\n        \"category\": \"mcp\",\n        \"key\": \"mcpServers.demo\",\n        \"value\": \"node\",\n        \"rank\": 3,\n        \"source\": \"<SYNTHETIC_ROOT>\\\\object-reordered\\\\.mcp.json\",\n        \"scope\": \"project\",\n        \"confidence\": \"declared\",\n        \"evidence\": \"<SYNTHETIC_ROOT>\\\\object-reordered\\\\.mcp.json#mcpServers.demo\"\n      }\n    ],\n    \"metadata\": {\n      \"source\": \"project configuration\",\n      \"semantics\": \"provider-neutral best-effort mapping; unknowns preserved\"\n    }\n  },\n  \"deltas\": []\n}\n",
+          "markdown": "# Agent Permission Diff\n\n- Configuration: project configuration\n- Permissions: 1\n- Changes: 0\n\nNo change from the baseline.\n",
+          "sarif": "{\n  \"version\": \"2.1.0\",\n  \"runs\": [\n    {\n      \"tool\": {\n        \"driver\": {\n          \"name\": \"Agent Permission Diff\",\n          \"informationUri\": \"https://github.com/DebadityaHait/agent-permission-diff\"\n        }\n      },\n      \"results\": []\n    }\n  ]\n}\n"
+        },
+        "agentdrift": {
+          "json": "[]\r\n"
+        }
+      }
+    }
+  ],
+  "mcp_native": [
+    {
+      "name": "tool-added",
+      "expected": true,
+      "signal": true,
+      "match": true,
+      "report": {
+        "decision": "REVIEW",
+        "a": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:f8c0d1f4b2da4a94141a7005f9f0926bf9935ce8c94d6069155109067a6893f9"
+        },
+        "b": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:01b141473ffeecf17663c2439b42772c1eb7bbcd74d61bf2d9b8a886a45aa390"
+        },
+        "changes": [
+          {
+            "kind": "tool.added",
+            "severity": "review",
+            "tool": "tool:lookup",
+            "detail": "+ tool `lookup`",
+            "frameworks": {
+              "owasp_llm": null,
+              "owasp_agentic": null,
+              "mitre_atlas": null,
+              "safe_mcp": null
+            }
+          }
+        ],
+        "ruleset": {
+          "id": "formalcore.default",
+          "version": "0.1.0",
+          "fingerprint": "sha256:cc6a103c2350510fba76375ab94136f30eeaeeafe189b58b5db8b5782d02617b"
+        }
+      },
+      "markdown": "## MCP capability authority diff\n\n`synthetic@1` → `synthetic@1`\n\n### ⚠️ REVIEW\n\n- ⚠️ + tool `lookup`\n\n<sub>black-box declared-manifest diff · fingerprint sha256:f8c0d1f4b2da4 → sha256:01b141473ffee · ruleset formalcore.default@0.1.0 sha256:cc6a103c23505 · no tools were executed</sub>"
+    },
+    {
+      "name": "read-only-lost",
+      "expected": true,
+      "signal": true,
+      "match": true,
+      "report": {
+        "decision": "DENY",
+        "a": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:f57fa5a0ae85a94493c1278a6cbb6af37b189fd1042575a7a4c9fd8325057b2f"
+        },
+        "b": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:69297c914fc671f93c0eb332d2cc77a76f5246ab2b07d9deb62900a0b14a551e"
+        },
+        "changes": [
+          {
+            "kind": "tool.annotation.read_only_lost",
+            "severity": "deny",
+            "tool": "tool:lookup",
+            "detail": "~ `lookup` no longer read-only (readOnlyHint dropped)",
+            "frameworks": {
+              "owasp_llm": "LLM06",
+              "owasp_agentic": null,
+              "mitre_atlas": null,
+              "safe_mcp": "SAF-T1201"
+            }
+          }
+        ],
+        "ruleset": {
+          "id": "formalcore.default",
+          "version": "0.1.0",
+          "fingerprint": "sha256:cc6a103c2350510fba76375ab94136f30eeaeeafe189b58b5db8b5782d02617b"
+        }
+      },
+      "markdown": "## MCP capability authority diff\n\n`synthetic@1` → `synthetic@1`\n\n### 🛑 DENY\n\n- 🛑 ~ `lookup` no longer read-only (readOnlyHint dropped)  [SAF-T1201 LLM06]\n\n<sub>black-box declared-manifest diff · fingerprint sha256:f57fa5a0ae85a → sha256:69297c914fc67 · ruleset formalcore.default@0.1.0 sha256:cc6a103c23505 · no tools were executed</sub>"
+    },
+    {
+      "name": "schema-changed",
+      "expected": true,
+      "signal": true,
+      "match": true,
+      "report": {
+        "decision": "REVIEW",
+        "a": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:1b73dfd9ed567ddace4a1e373e1f215f8ac81226d5a8b05c9be868cd1f7232a2"
+        },
+        "b": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:22e931573f0e77d8ff0c47ddd9dc50d6eb989cc0cf3e9cbeaf0fddd3173af2fe"
+        },
+        "changes": [
+          {
+            "kind": "tool.schema_changed",
+            "severity": "review",
+            "tool": "tool:lookup",
+            "detail": "~ `lookup` input schema changed",
+            "frameworks": {
+              "owasp_llm": null,
+              "owasp_agentic": null,
+              "mitre_atlas": null,
+              "safe_mcp": "SAF-T1501"
+            }
+          }
+        ],
+        "ruleset": {
+          "id": "formalcore.default",
+          "version": "0.1.0",
+          "fingerprint": "sha256:cc6a103c2350510fba76375ab94136f30eeaeeafe189b58b5db8b5782d02617b"
+        }
+      },
+      "markdown": "## MCP capability authority diff\n\n`synthetic@1` → `synthetic@1`\n\n### ⚠️ REVIEW\n\n- ⚠️ ~ `lookup` input schema changed  [SAF-T1501]\n\n<sub>black-box declared-manifest diff · fingerprint sha256:1b73dfd9ed567 → sha256:22e931573f0e7 · ruleset formalcore.default@0.1.0 sha256:cc6a103c23505 · no tools were executed</sub>"
+    },
+    {
+      "name": "identical",
+      "expected": false,
+      "signal": false,
+      "match": true,
+      "report": {
+        "decision": "CLEAN",
+        "a": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:227ece0d8899a2ed527f69295cd0131c1bb1a42f030afd9d8a5d10006993b3ea"
+        },
+        "b": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:227ece0d8899a2ed527f69295cd0131c1bb1a42f030afd9d8a5d10006993b3ea"
+        },
+        "changes": [],
+        "ruleset": {
+          "id": "formalcore.default",
+          "version": "0.1.0",
+          "fingerprint": "sha256:cc6a103c2350510fba76375ab94136f30eeaeeafe189b58b5db8b5782d02617b"
+        }
+      },
+      "markdown": "## MCP capability authority diff\n\n`synthetic@1` → `synthetic@1`\n\n### ✅ CLEAN\n\n- no capability changes\n\n<sub>black-box declared-manifest diff · fingerprint sha256:227ece0d8899a → sha256:227ece0d8899a · ruleset formalcore.default@0.1.0 sha256:cc6a103c23505 · no tools were executed</sub>"
+    },
+    {
+      "name": "schema-key-reorder",
+      "expected": false,
+      "signal": false,
+      "match": true,
+      "report": {
+        "decision": "CLEAN",
+        "a": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:01138f075cbcf44df603e7bcd81cee0a3cc614bfa3d45146a8646deb7b54482f"
+        },
+        "b": {
+          "name": "synthetic",
+          "version": "1",
+          "fingerprint": "sha256:01138f075cbcf44df603e7bcd81cee0a3cc614bfa3d45146a8646deb7b54482f"
+        },
+        "changes": [],
+        "ruleset": {
+          "id": "formalcore.default",
+          "version": "0.1.0",
+          "fingerprint": "sha256:cc6a103c2350510fba76375ab94136f30eeaeeafe189b58b5db8b5782d02617b"
+        }
+      },
+      "markdown": "## MCP capability authority diff\n\n`synthetic@1` → `synthetic@1`\n\n### ✅ CLEAN\n\n- no capability changes\n\n<sub>black-box declared-manifest diff · fingerprint sha256:01138f075cbcf → sha256:01138f075cbcf · ruleset formalcore.default@0.1.0 sha256:cc6a103c23505 · no tools were executed</sub>"
+    }
+  ],
+  "nativeStrengths": {
+    "apd_codex": [
+      {
+        "id": "APD005",
+        "kind": "broadened",
+        "severity": "critical",
+        "agent": "codex",
+        "category": "sandbox",
+        "key": "sandbox_mode",
+        "from": "read-only",
+        "to": "danger-full-access",
+        "source": "<SYNTHETIC_ROOT>\\codex-native\\.codex\\config.toml",
+        "message": "sandbox privilege broadened"
+      }
+    ],
+    "agentdrift_instruction": [
+      {
+        "rule_id": "AD005",
+        "severity": "high",
+        "message": "Safety control removed: confirmation/approval requirement",
+        "file": "AGENTS.md",
+        "commit": "synthetic",
+        "commit_date": "2026-09-07",
+        "author": "synthetic",
+        "line": "Require human approval before sending email.",
+        "change_type": "removed"
+      }
+    ],
+    "monna": "Both native formats unsupported; not scored as a false negative."
+  },
+  "limitations": [
+    "Expectations authored by MONNA; no independent labels.",
+    "Same JSON bytes for three config engines; agentdrift receives exact changed lines from difflib, not a Git-history CLI run.",
+    "No real MCP process, credentials or network service used.",
+    "Detection means any finding, not a correct explanation or severity.",
+    "All generated files stay in temporary fixture directories; input snapshots are synthetic.",
+    "Native Codex/instruction positive cases added as a separate coverage check, never merged into the common score."
+  ]
+}
