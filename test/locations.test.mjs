@@ -6,7 +6,6 @@ import { parseConfig,ConfigError } from '../src/json.mjs';
 const errorOf=text=>{try{parseConfig(text);}catch(error){assert.ok(error instanceof ConfigError,'expected a ConfigError');return error;}throw new Error('expected the parser to reject this input');};
 
 test('bare CR line endings produce the same evidence positions as LF',()=>{
-  const lf=text=>text.replaceAll('\n','\n');
   const beforeLf='{\n  "permissions": {\n    "allow": ["Read"],\n    "deny": ["Read(.env)"]\n  }\n}\n';
   const afterLf='{\n  "permissions": {\n    "allow": ["Read","Bash"],\n    "deny": []\n  }\n}\n';
   const beforeCr=beforeLf.replaceAll('\n','\r');
