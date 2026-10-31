@@ -4,6 +4,11 @@ const object=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const canonical=x=>Array.isArray(x)?x.map(canonical):object(x)?Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])])):x;
 const equal=(a,b)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b));
 const esc=k=>k.replaceAll('~','~0').replaceAll('/','~1');
+function firstIndices(values){
+  const indices=new Map();
+  for(const [i,value]of(values??[]).entries())if(!indices.has(value))indices.set(value,i);
+  return indices;
+}
 function validate(c,format){
   const obj=(v)=>{if(!object(v))throw new ConfigError('Expected an object in a supported configuration field.');};
   const arr=(v)=>{if(!Array.isArray(v)||v.some(s=>typeof s!=='string'))throw new ConfigError('Expected a string array in a supported configuration field.');};
@@ -38,9 +43,9 @@ export function compare(beforeText,afterText,{format='auto'}={}){
     }
   }
   function sets(a,b,p,addCode,removeCode,addSeverity='high',removeSeverity='info'){
-    const x=new Set(a??[]),y=new Set(b??[]);
-    for(const v of [...y].sort())if(!x.has(v))add(addCode,addSeverity,'An entry was added. Review the cited source; values are omitted from reports.',p,p+'/'+b.indexOf(v),'potential_expansion');
-    for(const v of [...x].sort())if(!y.has(v))add(removeCode,removeSeverity,'An entry was removed. Review the cited source; values are omitted from reports.',p+'/'+a.indexOf(v),p,'potential_reduction');
+    const x=firstIndices(a),y=firstIndices(b);
+    for(const v of [...y.keys()].sort())if(!x.has(v))add(addCode,addSeverity,'An entry was added. Review the cited source; values are omitted from reports.',p,p+'/'+y.get(v),'potential_expansion');
+    for(const v of [...x.keys()].sort())if(!y.has(v))add(removeCode,removeSeverity,'An entry was removed. Review the cited source; values are omitted from reports.',p+'/'+x.get(v),p,'potential_reduction');
   }
   if(format==='claude-settings'){
     const a=before.data.permissions??{},b=after.data.permissions??{};
