@@ -43,7 +43,7 @@ export function compare(beforeText,afterText,{format='auto'}={}){
     for(const v of [...x].sort())if(!y.has(v))add(removeCode,removeSeverity,'An entry was removed. Review the cited source; values are omitted from reports.',p+'/'+a.indexOf(v),p,'potential_reduction');
   }
   if(format==='claude-settings'){
-    const a=before.data.permissions??{},b=after.data.permissions??{};
+    const a=before.data.permissions??Object.create(null),b=after.data.permissions??Object.create(null);
     sets(a.allow,b.allow,'/permissions/allow','ALLOW_ADDED','ALLOW_REMOVED');
     sets(a.deny,b.deny,'/permissions/deny','DENY_ADDED','DENY_REMOVED','info','high');
     sets(a.ask,b.ask,'/permissions/ask','ASK_ADDED','ASK_REMOVED','info','high');
@@ -56,8 +56,8 @@ export function compare(beforeText,afterText,{format='auto'}={}){
     const a=before.data.mcpServers,b=after.data.mcpServers;
     for(const name of [...new Set([...Object.keys(a),...Object.keys(b)])].sort()){
       const p='/mcpServers/'+esc(name),x=a[name],y=b[name];
-      if(!x){add('SERVER_ADDED','high','A server configuration was added. This does not prove which tools or permissions it exposes.', '/mcpServers',p,'potential_expansion');unknown({},y,['command','args','url','type','env','headers','disabled'],p);continue;}
-      if(!y){add('SERVER_REMOVED','info','A server configuration was removed. Other settings may still enable the server.',p,'/mcpServers','potential_reduction');unknown(x,{},['command','args','url','type','env','headers','disabled'],p);continue;}
+      if(!x){add('SERVER_ADDED','high','A server configuration was added. This does not prove which tools or permissions it exposes.', '/mcpServers',p,'potential_expansion');unknown(Object.create(null),y,['command','args','url','type','env','headers','disabled'],p);continue;}
+      if(!y){add('SERVER_REMOVED','info','A server configuration was removed. Other settings may still enable the server.',p,'/mcpServers','potential_reduction');unknown(x,Object.create(null),['command','args','url','type','env','headers','disabled'],p);continue;}
       for(const [k,code,sev,msg]of [
         ['command','COMMAND_CHANGED','high','The server executable changed; review its provenance without executing it.'],
         ['args','ARGUMENTS_CHANGED','high','Server arguments changed. Arguments can alter execution or access scope; values are withheld.'],
