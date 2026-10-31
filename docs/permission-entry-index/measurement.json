@@ -1,0 +1,104 @@
+{
+  "baseline": "7555911a4990338791853c7f363c01941a2fd376",
+  "runtime": "v24.15.0",
+  "platform": "win32",
+  "architecture": "x64",
+  "scope": "One fictional, admitted 40000-entry disjoint-list case; not an independent or general performance benchmark.",
+  "inputs": {
+    "before": {
+      "characters": 360027,
+      "bytes": 360027,
+      "nodes": 40003,
+      "sha256": "0b3b23700dd8241ecc5722e5be6572149fa35ab4725c959fcf9039b79bf87e60"
+    },
+    "after": {
+      "characters": 360027,
+      "bytes": 360027,
+      "nodes": 40003,
+      "sha256": "9a4ea1cbf528b0b05a81479e5b11407b6693c81c14cb792e4cd822b480c8ffcb"
+    }
+  },
+  "findings": 80000,
+  "core": {
+    "before": [
+      1628.4932,
+      1766.7696,
+      1677.6490000000003,
+      1801.0913,
+      1655.7666000000008
+    ],
+    "after": [
+      155.0340000000001,
+      150.09929999999986,
+      93.97929999999997,
+      99.35639999999967,
+      92.16840000000047
+    ],
+    "before_median_ms": 1677.6490000000003,
+    "after_median_ms": 99.35639999999967,
+    "speedup": 16.885162908479032,
+    "json_sha256": "d04123032f02d66c18a6d669c4810cc0adf6d78a260a3d0a302a6fb95dbb9635"
+  },
+  "cli": {
+    "json": {
+      "before": [
+        1647.2563999999984,
+        1642.457699999999,
+        1633.6170999999995
+      ],
+      "after": [
+        270.41610000000037,
+        266.66049999999996,
+        283.65270000000237
+      ],
+      "before_median_ms": 1642.457699999999,
+      "after_median_ms": 270.41610000000037,
+      "speedup": 6.073816240970848,
+      "output": {
+        "byte_identical": true,
+        "bytes": 31176019,
+        "sha256": "a539c67f13990c546847b5a05e5a2c848556c795e6f24a9f349eb8283f8d5c92"
+      }
+    },
+    "markdown": {
+      "before": [
+        1571.4867999999988,
+        1572.961800000001,
+        1530.893500000002
+      ],
+      "after": [
+        219.928100000001,
+        207.06730000000243,
+        204.56820000000153
+      ],
+      "before_median_ms": 1571.4867999999988,
+      "after_median_ms": 207.06730000000243,
+      "speedup": 7.58925624664049,
+      "output": {
+        "byte_identical": true,
+        "bytes": 9040671,
+        "sha256": "1cbc1fa36e21ae67ec321cbc01d8693bc7e9d494223b52f46b624b425f508548"
+      }
+    },
+    "sarif": {
+      "before": [
+        1804.5587000000014,
+        1770.7626000000018,
+        1808.4479000000028
+      ],
+      "after": [
+        449.1100000000006,
+        457.35789999999906,
+        455.7550999999985
+      ],
+      "before_median_ms": 1804.5587000000014,
+      "after_median_ms": 455.7550999999985,
+      "speedup": 3.9594920605386696,
+      "output": {
+        "byte_identical": true,
+        "bytes": 80336465,
+        "sha256": "ed7bce73f1581ea40ea5fcca99ce95742c7d008125edbbe627b557b8dfe33138"
+      }
+    }
+  }
+}

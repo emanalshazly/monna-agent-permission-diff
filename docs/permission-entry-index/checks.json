@@ -1,0 +1,124 @@
+{
+  "source_base": "7555911a4990338791853c7f363c01941a2fd376",
+  "runtime": "v24.15.0",
+  "node_test": {
+    "command": "node --test",
+    "tests": 42,
+    "passed": 42,
+    "failed": 0,
+    "skipped": 0,
+    "local_log_sha256": "df7d5a3f4fcdfdf80ae362ae985707e6ad0da41f2da25fae64e468e179a6bc60"
+  },
+  "benchmark_command": "node benchmark/run.mjs",
+  "benchmark_output_sha256": "ba7d0d99ba1ea0dc19269602f139bc9f611e42c2fe4b8a97e3f82ed602ad6672",
+  "benchmark": {
+    "benchmark_version": "1.0",
+    "scope": "10 synthetic fixtures; not a market-wide or independent benchmark",
+    "runtime": "v24.15.0",
+    "platform": "win32",
+    "passed": 10,
+    "total": 10,
+    "iterations": 1000,
+    "p95_ms": 0.023699999999998056,
+    "results": [
+      {
+        "case": "allow-expansion",
+        "expected": [
+          "ALLOW_ADDED"
+        ],
+        "actual": [
+          "ALLOW_ADDED"
+        ],
+        "pass": true
+      },
+      {
+        "case": "deny-removal",
+        "expected": [
+          "DENY_REMOVED"
+        ],
+        "actual": [
+          "DENY_REMOVED"
+        ],
+        "pass": true
+      },
+      {
+        "case": "approval-removal",
+        "expected": [
+          "ASK_REMOVED"
+        ],
+        "actual": [
+          "ASK_REMOVED"
+        ],
+        "pass": true
+      },
+      {
+        "case": "bypass-mode",
+        "expected": [
+          "MODE_CHANGED"
+        ],
+        "actual": [
+          "MODE_CHANGED"
+        ],
+        "pass": true
+      },
+      {
+        "case": "benign-reorder",
+        "expected": [],
+        "actual": [],
+        "pass": true
+      },
+      {
+        "case": "unknown-security-field",
+        "expected": [
+          "UNMODELED_CHANGE"
+        ],
+        "actual": [
+          "UNMODELED_CHANGE"
+        ],
+        "pass": true
+      },
+      {
+        "case": "new-server",
+        "expected": [
+          "SERVER_ADDED"
+        ],
+        "actual": [
+          "SERVER_ADDED"
+        ],
+        "pass": true
+      },
+      {
+        "case": "remote-endpoint",
+        "expected": [
+          "ENDPOINT_CHANGED"
+        ],
+        "actual": [
+          "ENDPOINT_CHANGED"
+        ],
+        "pass": true
+      },
+      {
+        "case": "credentials-rotation",
+        "expected": [
+          "ENVIRONMENT_CHANGED"
+        ],
+        "actual": [
+          "ENVIRONMENT_CHANGED"
+        ],
+        "pass": true
+      },
+      {
+        "case": "arguments-order",
+        "expected": [
+          "ARGUMENTS_CHANGED"
+        ],
+        "actual": [
+          "ARGUMENTS_CHANGED"
+        ],
+        "pass": true
+      }
+    ]
+  },
+  "hosted_ci_claimed": false,
+  "raw_large_reports_published": false
+}
