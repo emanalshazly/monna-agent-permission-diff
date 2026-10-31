@@ -62,7 +62,7 @@ steps:
       fail-on: medium
 ```
 
-The action needs Node 22+ on the runner. It adds the redacted report to the job summary and exposes `report-path`. Input values are passed through environment variables and a shell-free argument array. It checks that file targets remain within the workspace, including symlink resolution. No write token is required. Pinning instructions will accompany the first verified release.
+The action needs Node 22+ on the runner. It adds the redacted report to the job summary and exposes `report-path`. Each invocation uses a separate report directory; use the returned path when collecting reports. Input values are passed through environment variables and a shell-free argument array. It checks that file targets remain within the workspace, including symlink resolution. No write token is required. Pinning instructions will accompany the first verified release.
 
 ## Browser demo
 
