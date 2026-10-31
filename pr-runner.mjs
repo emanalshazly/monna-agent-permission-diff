@@ -1,4 +1,4 @@
-import {readFileSync,writeFileSync,appendFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,appendFileSync,mkdtempSync} from 'node:fs';
 import {join} from 'node:path';
 import {reviewPR,prMarkdown} from './src/pr-review.mjs';
 let text,exitCode=2,result;
@@ -11,7 +11,7 @@ try{
  result=reviewPR({cwd:process.env.GITHUB_WORKSPACE,repository:process.env.GITHUB_REPOSITORY,base:pr.base.sha,head:pr.head.sha,threshold:process.env.MONNA_FAIL_ON||'medium'});
  text=prMarkdown(result);exitCode=result.exitCode;
 }catch{text='# MONNA — Agent permission PR review\n\n**incomplete**: could not establish or read the PR comparison. Check the pull_request event, commit availability and full-history checkout. No clean result is claimed.\n';}
-const folder=process.env.RUNNER_TEMP||process.cwd();
+const folder=mkdtempSync(join(process.env.RUNNER_TEMP||process.cwd(),'monna-pr-review-'));
 const reportPath=join(folder,'monna-pr-review.md');
 writeFileSync(reportPath,text);
 if(result)writeFileSync(join(folder,'monna-pr-review.json'),JSON.stringify(result,null,2)+'\n');
