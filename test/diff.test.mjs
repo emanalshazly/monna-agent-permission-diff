@@ -28,6 +28,28 @@ test('unmodeled field changes are not silent',()=>{
 test('unchanged unknown fields still mark coverage partial',()=>{
   const r=c({futureRule:true},{futureRule:true});assert.equal(r.findings.length,0);assert.equal(r.coverage.status,'partial');
 });
+
+test('unknown own keys remain changes when a permissions section is absent',()=>{
+  const changed='{\n "permissions": {\n  "__proto__": {}\n }\n}';
+  for(const [a,b] of [['{}',changed],[changed,'{}']]){
+    const r=compare(a,b,{format:'claude-settings'});
+    assert.deepEqual(r.findings.map(f=>f.code),['UNMODELED_CHANGE']);
+    assert.equal(shouldFail(r,'medium'),true);assert.equal(r.coverage.status,'partial');
+    assert.equal((a==='{}'?r.findings[0].evidence.after:r.findings[0].evidence.before).line,3);
+    for(const out of [JSON.stringify(r),markdown(r),JSON.stringify(sarif(r))])assert.ok(!out.includes('__proto__'));
+  }
+  assert.equal(compare(changed,changed,{format:'claude-settings'}).findings.length,0);
+});
+
+test('added and removed MCP server unknown keys compare only own JSON fields',()=>{
+  const empty='{"mcpServers":{}}';
+  const changed='{"mcpServers":{"fictional":{"__proto__":{}}}}';
+  for(const [a,b,code] of [[empty,changed,'SERVER_ADDED'],[changed,empty,'SERVER_REMOVED']]){
+    const r=compare(a,b,{format:'mcp'});
+    assert.deepEqual(r.findings.map(f=>f.code),[code,'UNMODELED_CHANGE']);
+    assert.ok(!JSON.stringify(r).includes('fictional'));
+  }
+});
 test('new MCP servers flag expansion and unknown fields',()=>{
   const r=c({mcpServers:{}},{mcpServers:{x:{command:'node',futurePermission:'wide'}}},'mcp');assert.deepEqual(r.findings.map(f=>f.code),['SERVER_ADDED','UNMODELED_CHANGE']);assert.equal(r.coverage.status,'partial');
 });
