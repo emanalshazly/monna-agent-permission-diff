@@ -4,6 +4,20 @@ import {tmpdir} from 'node:os';import {join,dirname,resolve} from 'node:path';im
 import {reviewPR,prMarkdown} from '../src/pr-review.mjs';
 function fixture(){const cwd=mkdtempSync(join(tmpdir(),'monna-pr-test-'));const git=(...args)=>{const r=spawnSync('git',['-c','user.name=Test','-c','user.email=test@example.invalid','-c','commit.gpgsign=false',...args],{cwd,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};git('init','--initial-branch=main');const write=(p,text)=>{mkdirSync(dirname(join(cwd,p)),{recursive:true});writeFileSync(join(cwd,p),text);};const commit=()=>{git('add','.');git('commit','--allow-empty','-m','fixture');return git('rev-parse','HEAD');};write('README.md','fixture');const base=commit();return {cwd,git,write,commit,base};}
 const opts=(f,base,head)=>({cwd:f.cwd,base,head,repository:'example/project'});
+
+test('PR reads the selected repository when called from another Git context',()=>{
+ const selected=fixture();selected.write('.claude/settings.json','{"permissions":{"allow":["FICTIONAL_READ"]}}');const head=selected.commit();
+ const ambient=fixture();const original={...process.env};
+ try{
+  for(const routing of [{GIT_DIR:join(ambient.cwd,'.git'),GIT_WORK_TREE:ambient.cwd},{GIT_OBJECT_DIRECTORY:join(ambient.cwd,'.git','objects')},{GIT_COMMON_DIR:join(ambient.cwd,'.git')}]){
+   Object.assign(process.env,routing);
+   const report=reviewPR(opts(selected,selected.base,head));
+   assert.equal(report.exitCode,1);assert.equal(report.files[0].report.findings[0].code,'ALLOW_ADDED');
+   for(const key of Object.keys(routing)){assert.equal(process.env[key],routing[key]);delete process.env[key];}
+  }
+ }finally{for(const key of Object.keys(process.env))if(!(key in original))delete process.env[key];Object.assign(process.env,original);}
+ assert.equal(reviewPR(opts(selected,selected.base,head)).files[0].path,'.claude/settings.json');
+});
 test('PR discovers added config, creates empty baseline and actionable exact links',()=>{const f=fixture();f.write('.claude/settings.json','{\n"permissions":{"allow":["Bash(*)"]}\n}');const head=f.commit();const r=reviewPR(opts(f,f.base,head));assert.equal(r.exitCode,1);assert.equal(r.files[0].beforePresent,false);const md=prMarkdown(r);assert.match(md,/ALLOW_ADDED/);assert.match(md,/Why review:/);assert.match(md,/Action:/);assert.match(md,/synthetic empty baseline/);assert.ok(md.includes(`/blob/${head}/.claude/settings.json#L2`));assert.ok(!md.includes('Bash(*)'));});
 test('PR deletion detects removed approval and deny rules',()=>{const f=fixture();f.write('.claude/settings.json','{"permissions":{"deny":["Read"],"ask":["Bash"]}}');const base=f.commit();unlinkSync(join(f.cwd,'.claude/settings.json'));const r=reviewPR(opts(f,base,f.commit()));assert.deepEqual(r.files[0].report.findings.map(x=>x.code),['DENY_REMOVED','ASK_REMOVED']);assert.match(prMarkdown(r),/file removed/);});
 test('PR uses merge base rather than unrelated changes added to base branch',()=>{const f=fixture();f.git('checkout','-b','proposal');f.write('.claude/settings.json','{"permissions":{"allow":["Write"]}}');const head=f.commit();f.git('checkout','main');f.write('.mcp.json','{"mcpServers":{"other":{"command":"node"}}}');const base=f.commit();const r=reviewPR(opts(f,base,head));assert.equal(r.mergeBase,f.base);assert.equal(r.files.length,1);assert.equal(r.files[0].path,'.claude/settings.json');});
