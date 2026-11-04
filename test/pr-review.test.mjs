@@ -27,3 +27,27 @@ test('PR deletion of an unsupported configuration links to merge base rather tha
  assert.ok(md.includes(`/blob/${base}/.vscode/mcp.json#L1`));
  assert.ok(!md.includes(`/blob/${head}/.vscode/mcp.json#L1`));
 });
+test('PR preserves incomplete status when a supported configuration cannot be read (oversized or invalid UTF-8)',()=>{
+ const f=fixture();
+ f.write('.claude/settings.json','{}'+' '.repeat(2000000));
+ const head=f.commit();
+ const r=reviewPR(opts(f,f.base,head));
+ assert.equal(r.exitCode,2);
+ assert.equal(r.verdict,'incomplete');
+ assert.equal(r.files[0].status,'error');
+ assert.equal(r.files[0].beforePresent,false);
+ assert.equal(r.files[0].afterPresent,true);
+});
+test('PR deletion of an unreadable supported configuration preserves incomplete status',()=>{
+ const f=fixture();
+ f.write('.claude/settings.json','{}'+' '.repeat(2000000));
+ const base=f.commit();
+ unlinkSync(join(f.cwd,'.claude/settings.json'));
+ const head=f.commit();
+ const r=reviewPR(opts(f,base,head));
+ assert.equal(r.exitCode,2);
+ assert.equal(r.verdict,'incomplete');
+ assert.equal(r.files[0].status,'error');
+ assert.equal(r.files[0].beforePresent,true);
+ assert.equal(r.files[0].afterPresent,false);
+});
