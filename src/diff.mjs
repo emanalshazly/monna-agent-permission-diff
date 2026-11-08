@@ -17,8 +17,10 @@ function validate(c,format){
     }
   }
 }
+// Name the invalid input; parser and shape messages alone do not say which file failed.
+function side(label,check){try{return check();}catch(e){if(e instanceof ConfigError)throw new ConfigError(`${label} configuration: ${e.message}`);throw e;}}
 export function compare(beforeText,afterText,{format='auto'}={}){
-  const before=parseConfig(beforeText),after=parseConfig(afterText);
+  const before=side('Before',()=>parseConfig(beforeText)),after=side('After',()=>parseConfig(afterText));
   if(format==='auto'){
     const mcp=Object.hasOwn(before.data,'mcpServers')||Object.hasOwn(after.data,'mcpServers');
     const claude=Object.hasOwn(before.data,'permissions')||Object.hasOwn(after.data,'permissions');
@@ -27,7 +29,7 @@ export function compare(beforeText,afterText,{format='auto'}={}){
     format=mcp?'mcp':'claude-settings';
   }
   if(!['mcp','claude-settings'].includes(format))throw new ConfigError('Unsupported format.');
-  validate(before.data,format);validate(after.data,format);
+  side('Before',()=>validate(before.data,format));side('After',()=>validate(after.data,format));
   const findings=[];const coverage=[];
   const location=(doc,p)=>{while(!doc.locations.has(p)&&p)p=p.slice(0,p.lastIndexOf('/'));return doc.locations.get(p);};
   const add=(code,severity,message,p='',q=p,direction='review')=>findings.push({code,severity,direction,message,evidence:{before:location(before,p),after:location(after,q)}});
