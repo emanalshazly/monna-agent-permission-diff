@@ -10,7 +10,7 @@
 | Reproducible output | Key reorder invariance, stable order and no clock-dependent fields | 100 reorder cases plus repeated comparisons |
 | GitHub usability | Job summary, exit threshold, workspace-bound file access | PASS: local Action runner tests and hosted CI |
 | Cross-platform | Node 22/24 on Linux, macOS and Windows | PASS: all six jobs in [run 34076919616](https://github.com/emanalshazly/monna-agent-permission-diff/actions/runs/34076919616) |
-| Browser workflow | Compare sample, invalid input, language switch, exports | Earlier sample/invalid-input checks plus six automated local Chromium tests: completed Markdown/SARIF download bytes for Claude and MCP changes in English/Arabic, stable rule IDs, canary redaction and copyable text when downloads are refused. Other browser engines remain unverified. |
+| Browser workflow | Compare sample, invalid input, language switch, exports | Earlier sample/invalid-input checks plus eight automated local Chromium tests: completed Markdown/SARIF download bytes for Claude and MCP changes in English/Arabic, stable rule IDs, canary redaction and copyable text when downloads are refused. Other browser engines remain unverified. |
 
 The benchmark's ten authored fixtures are transparent engineering checks, not independent evidence of superiority. Keep this distinction in announcements.
 
@@ -27,3 +27,6 @@ Schema SHA-256: `c3b4bb2d6093897483348925aaa73af03b3e3f4bd4ca38cef26dcb4212a2682
 Reproduce with `python benchmark/validate-sarif.py` in an isolated environment containing `jsonschema==4.23.0` and Node on PATH. This optional maintainer audit downloads the public pinned schema and verifies its digest. It sends no configuration data. Normal product use remains dependency-installation-free and performs no analysis network requests.
 
 This follow-up closes the schema-validation gap recorded in the original v0.1.0 release notes. It does not prove all SARIF semantic requirements, GitHub ingestion, security effectiveness or market superiority. The five cases are authored tests, not an independent audit.
+
+
+Consolidation verification, 2026-11-14: the proposed test-only delta built on PR3 head8c9947a and the additional unsupported-field fixture from PR18 headcff55b2 passed8/8 on Windows/Node22.23.4/Playwright1.64.1/Chromium156.0.8078.4. Twelve completed Markdown/SARIF files were independently parsed and four refused-download fallbacks retained. The prior macOS6/6 result above remains historical. Production evaluator/report code and dependency lock are unchanged; no hosted CI, other-engine or GitHub-ingestion claim follows from this local candidate check.

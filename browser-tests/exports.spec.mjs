@@ -18,6 +18,16 @@ const fixtures = [
     after: {mcpServers: {fictional: {command: 'not-executed', env: {[canary]: canary}}}},
     codes: ['ENVIRONMENT_CHANGED'],
   },
+  // Preserve PR18's useful unsupported-field redaction case (huadeng408, MIT).
+  // This explicit Claude-mode fixture is NOT supported MCP environment coverage.
+  {
+    name: 'Unmodeled extension redaction in explicit Claude mode',
+    format: 'claude-settings',
+    before: {permissions: {allow: ['Read(./docs/**)']}, mcpServers: {demo: {command: 'not-executed', env: {}}}},
+    after: {permissions: {allow: ['Read(./docs/**)', 'Bash(curl:*)']}, mcpServers: {demo: {command: 'not-executed', env: {API_KEY: canary}}}},
+    codes: ['ALLOW_ADDED', 'UNMODELED_CHANGE'],
+    coverage: 'partial',
+  },
 ];
 
 async function compareInBrowser(page, language, fixture) {
@@ -39,7 +49,7 @@ function checkReport(text, format, fixture) {
     expect(text).toContain('# MONNA Agent Permission Diff');
     expect(text).toContain(`· ${fixture.format} · ${fixture.codes.length} findings`);
     for (const code of fixture.codes) expect(text).toContain(`| ${code} |`);
-    expect(text).toContain('Coverage: supported_fields_only.');
+    expect(text).toContain(`Coverage: ${fixture.coverage ?? 'supported_fields_only'}.`);
   } else {
     const report = JSON.parse(text);
     expect(report.version).toBe('2.1.0');
