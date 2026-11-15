@@ -84,3 +84,19 @@ test('SARIF uses synthetic artifact names and precise evidence coordinates',()=>
 test('seeded irrelevant key reorder property holds over 100 cases',()=>{
   for(let i=0;i<100;i++){const a={mcpServers:{x:{env:{A:String(i),B:'b'},args:['--scope',String(i)]}}};const b={mcpServers:{x:{args:['--scope',String(i)],env:{B:'b',A:String(i)}}}};assert.equal(c(a,b,'mcp').findings.length,0);}
 });
+test('input errors name the configuration that is invalid',()=>{
+  const good='{\n  "permissions": {\n    "allow": ["Read(./docs/**)"]\n  }\n}\n';
+  const bad='{\n  "permissions": {\n    "allow": ["Read(./docs/**)",]\n  }\n}\n';
+  const shape='{\n  "permissions": {\n    "allow": "SECRET_CANARY"\n  }\n}\n';
+  const error=(a,b,format)=>{try{compare(a,b,{format});}catch(e){assert.ok(e instanceof ConfigError);return e.message;}assert.fail('expected a ConfigError');};
+  assert.equal(error(good,bad),'After configuration: Invalid JSON value at line 3, column 33.');
+  assert.equal(error(bad,good),'Before configuration: Invalid JSON value at line 3, column 33.');
+  assert.equal(error(bad,bad),'Before configuration: Invalid JSON value at line 3, column 33.');
+  assert.equal(error(good,shape,'claude-settings'),'After configuration: Expected a string array in a supported configuration field.');
+  assert.equal(error(shape,good,'claude-settings'),'Before configuration: Expected a string array in a supported configuration field.');
+  assert.match(error('{"mcpServers":{}}','{}','mcp'),/^After configuration: MCP format requires mcpServers/);
+  assert.ok(!error(good,shape,'auto').includes('SECRET_CANARY'));
+  assert.match(error('{}','{}'),/^Cannot detect format/);
+  assert.match(error('{"mcpServers":{},"permissions":{}}','{}'),/^Ambiguous/);
+  assert.equal(compare(good,good).findings.length,0);
+});
