@@ -8,13 +8,14 @@ async function read(path){
 }
 try{
   const args=process.argv.slice(2);
-  if(args.includes('--help')){console.log('Usage: node cli.mjs BEFORE AFTER [--type auto|claude-settings|mcp] [--format json|markdown|sarif] [--fail-on none|info|medium|high|critical]\nExit: 0 below threshold; 1 review threshold reached; 2 invalid input. No network or server execution.');}
+  if(args.includes('--help')){console.log('Usage: node cli.mjs BEFORE AFTER [--type auto|claude-settings|mcp] [--format json|markdown|sarif] [--fail-on none|info|medium|high|critical] [--task TASK_POLICY_JSON]\nExit: 0 below threshold; 1 review threshold reached; 2 invalid input. No network or server execution.');}
   else{
     if(args.length<2)throw new ConfigError('Two input files are required. Use --help or npm run demo.');
-    const [a,b,...rest]=args;const options={type:'auto',format:'json','fail-on':'high'};const seen=new Set();
+    const [a,b,...rest]=args;const options={type:'auto',format:'json','fail-on':'high',task:undefined};const seen=new Set();
     for(let i=0;i<rest.length;i+=2){const key=rest[i].slice(2);if(!rest[i].startsWith('--')||!Object.hasOwn(options,key)||!rest[i+1]||seen.has(key))throw new ConfigError('Invalid or repeated option.');seen.add(key);options[key]=rest[i+1];}
     if(!['json','markdown','sarif'].includes(options.format))throw new ConfigError('Unsupported output format.');
-    const report=compare(await read(a),await read(b),{format:options.type});const fail=shouldFail(report,options['fail-on']);
+    const task=options.task===undefined?undefined:await read(options.task);
+    const report=compare(await read(a),await read(b),{format:options.type,task});const fail=shouldFail(report,options['fail-on']);
     console.log(options.format==='markdown'?markdown(report):JSON.stringify(options.format==='sarif'?sarif(report):report,null,2));process.exitCode=fail?1:0;
   }
 }catch(e){console.error(JSON.stringify({error:e instanceof ConfigError?e.message:'Unable to read configuration files.',status:'invalid_input'}));process.exitCode=2;}
