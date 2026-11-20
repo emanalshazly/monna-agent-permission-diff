@@ -30,12 +30,21 @@ export function reviewPR({cwd,base,head,repository,threshold='medium'}){
  if(paths.length>100)throw Error('More than 100 configuration files changed; split the review.');
  const files=paths.map(path=>{
   const format=supported(path);
-  if(!format)return {path,status:'unsupported',reason:'Recognized configuration format is not supported. Review this file manually.'};
+  if(!format){
+   const beforePresent=git(cwd,['ls-tree','-z',mergeBase,'--',path]).split('\0').filter(Boolean).length>0;
+   const afterPresent=git(cwd,['ls-tree','-z',head,'--',path]).split('\0').filter(Boolean).length>0;
+   return {path,status:'unsupported',beforePresent,afterPresent,reason:'Recognized configuration format is not supported. Review this file manually.'};
+  }
   try{
    const before=blob(cwd,mergeBase,path),after=blob(cwd,head,path);
+   const beforePresent=before!==null,afterPresent=after!==null;
    const empty=format==='mcp'?' {"mcpServers":{}} ':'{}';
-   return {path,status:'compared',beforePresent:before!==null,afterPresent:after!==null,report:compare(before??empty,after??empty,{format})};
-  }catch{return {path,status:'error',reason:'Configuration could not be compared: invalid JSON, unsupported Git entry, unavailable object or input limit. Review manually; no clean result is claimed.'};}
+   return {path,status:'compared',beforePresent,afterPresent,report:compare(before??empty,after??empty,{format})};
+  }catch{
+   const beforePresent=git(cwd,['ls-tree','-z',mergeBase,'--',path]).split('\0').filter(Boolean).length>0;
+   const afterPresent=git(cwd,['ls-tree','-z',head,'--',path]).split('\0').filter(Boolean).length>0;
+   return {path,status:'error',beforePresent,afterPresent,reason:'Configuration could not be compared: invalid JSON, unsupported Git entry, unavailable object or input limit. Review manually; no clean result is claimed.'};
+  }
  });
  const incomplete=files.some(f=>f.status!=='compared');
  const fail=files.some(f=>f.report&&shouldFail(f.report,threshold));

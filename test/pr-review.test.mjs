@@ -12,3 +12,42 @@ test('PR treats rename as deletion and addition',()=>{const f=fixture();f.write(
 test('PR rejects hostile refs and missing history without echoing their contents',()=>{const f=fixture();assert.throws(()=>reviewPR(opts(f,'--help',f.base)),/Invalid commit/);assert.throws(()=>reviewPR(opts(f,'a'.repeat(40),f.base)),/Git objects unavailable/);});
 test('PR encodes hostile path text in links, never echoes configuration values',()=>{const f=fixture();f.write('x](/.mcp.json','{"mcpServers":{"a":{"url":"https://example.invalid/?token=CANARY_NOT_REAL"}}}');const r=reviewPR(opts(f,f.base,f.commit()));const md=prMarkdown(r);assert.ok(md.includes('x%5D(/.mcp.json')===false);assert.ok(!md.includes('CANARY_NOT_REAL'));});
 test('PR action event emits summary and fails for review; refuses privileged event',()=>{const f=fixture();f.write('.claude/settings.json','{"permissions":{"defaultMode":"bypassPermissions"}}');const head=f.commit();const event=join(f.cwd,'event.json'),summary=join(f.cwd,'summary.md');writeFileSync(event,JSON.stringify({pull_request:{base:{sha:f.base,repo:{full_name:'example/project'}},head:{sha:head}}}));const env={...process.env,GITHUB_WORKSPACE:f.cwd,GITHUB_REPOSITORY:'example/project',GITHUB_EVENT_NAME:'pull_request',GITHUB_EVENT_PATH:event,GITHUB_STEP_SUMMARY:summary,RUNNER_TEMP:f.cwd};const runner=resolve('pr-runner.mjs');const r=spawnSync(process.execPath,[runner],{env,encoding:'utf8'});assert.equal(r.status,1);assert.match(readFileSync(summary,'utf8'),/MODE_CHANGED/);const denied=spawnSync(process.execPath,[runner],{env:{...env,GITHUB_EVENT_NAME:'pull_request_target'},encoding:'utf8'});assert.equal(denied.status,2);});
+test('PR deletion of an unsupported configuration links to merge base rather than head',()=>{
+ const f=fixture();
+ f.write('.vscode/mcp.json','{"mcpServers":{}}');
+ const base=f.commit();
+ unlinkSync(join(f.cwd,'.vscode/mcp.json'));
+ const head=f.commit();
+ const r=reviewPR(opts(f,base,head));
+ assert.equal(r.files.length,1);
+ assert.equal(r.files[0].status,'unsupported');
+ assert.equal(r.files[0].beforePresent,true);
+ assert.equal(r.files[0].afterPresent,false);
+ const md=prMarkdown(r);
+ assert.ok(md.includes(`/blob/${base}/.vscode/mcp.json#L1`));
+ assert.ok(!md.includes(`/blob/${head}/.vscode/mcp.json#L1`));
+});
+test('PR preserves incomplete status when a supported configuration cannot be read (oversized or invalid UTF-8)',()=>{
+ const f=fixture();
+ f.write('.claude/settings.json','{}'+' '.repeat(2000000));
+ const head=f.commit();
+ const r=reviewPR(opts(f,f.base,head));
+ assert.equal(r.exitCode,2);
+ assert.equal(r.verdict,'incomplete');
+ assert.equal(r.files[0].status,'error');
+ assert.equal(r.files[0].beforePresent,false);
+ assert.equal(r.files[0].afterPresent,true);
+});
+test('PR deletion of an unreadable supported configuration preserves incomplete status',()=>{
+ const f=fixture();
+ f.write('.claude/settings.json','{}'+' '.repeat(2000000));
+ const base=f.commit();
+ unlinkSync(join(f.cwd,'.claude/settings.json'));
+ const head=f.commit();
+ const r=reviewPR(opts(f,base,head));
+ assert.equal(r.exitCode,2);
+ assert.equal(r.verdict,'incomplete');
+ assert.equal(r.files[0].status,'error');
+ assert.equal(r.files[0].beforePresent,true);
+ assert.equal(r.files[0].afterPresent,false);
+});
