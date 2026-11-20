@@ -1,4 +1,5 @@
 import { parseConfig, ConfigError } from './json.mjs';
+import { parseTask, reviewTaskChange } from './task.mjs';
 export const VERSION='0.1.0';
 const object=x=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const canonical=x=>Array.isArray(x)?x.map(canonical):object(x)?Object.fromEntries(Object.keys(x).sort().map(k=>[k,canonical(x[k])])):x;
@@ -17,8 +18,9 @@ function validate(c,format){
     }
   }
 }
-export function compare(beforeText,afterText,{format='auto'}={}){
+export function compare(beforeText,afterText,{format='auto',task}={}){
   const before=parseConfig(beforeText),after=parseConfig(afterText);
+  const taskPolicy=task===undefined?undefined:parseTask(task);
   if(format==='auto'){
     const mcp=Object.hasOwn(before.data,'mcpServers')||Object.hasOwn(after.data,'mcpServers');
     const claude=Object.hasOwn(before.data,'permissions')||Object.hasOwn(after.data,'permissions');
@@ -30,7 +32,11 @@ export function compare(beforeText,afterText,{format='auto'}={}){
   validate(before.data,format);validate(after.data,format);
   const findings=[];const coverage=[];
   const location=(doc,p)=>{while(!doc.locations.has(p)&&p)p=p.slice(0,p.lastIndexOf('/'));return doc.locations.get(p);};
-  const add=(code,severity,message,p='',q=p,direction='review')=>findings.push({code,severity,direction,message,evidence:{before:location(before,p),after:location(after,q)}});
+  function add(code,severity,message,p='',q=p,direction='review',rule){
+    const finding={code,severity,direction,message,evidence:{before:location(before,p),after:location(after,q)}};
+    if(taskPolicy)finding.task_review=reviewTaskChange(taskPolicy,code,rule);
+    findings.push(finding);
+  }
   function unknown(a,b,known,p=''){
     for(const k of [...new Set([...Object.keys(a),...Object.keys(b)])].sort())if(!known.includes(k)){
       coverage.push({status:'unsupported',evidence:{before:location(before,p+'/'+esc(k)),after:location(after,p+'/'+esc(k))}});
@@ -39,8 +45,8 @@ export function compare(beforeText,afterText,{format='auto'}={}){
   }
   function sets(a,b,p,addCode,removeCode,addSeverity='high',removeSeverity='info'){
     const x=new Set(a??[]),y=new Set(b??[]);
-    for(const v of [...y].sort())if(!x.has(v))add(addCode,addSeverity,'An entry was added. Review the cited source; values are omitted from reports.',p,p+'/'+b.indexOf(v),'potential_expansion');
-    for(const v of [...x].sort())if(!y.has(v))add(removeCode,removeSeverity,'An entry was removed. Review the cited source; values are omitted from reports.',p+'/'+a.indexOf(v),p,'potential_reduction');
+    for(const v of [...y].sort())if(!x.has(v))add(addCode,addSeverity,'An entry was added. Review the cited source; values are omitted from reports.',p,p+'/'+b.indexOf(v),'potential_expansion',v);
+    for(const v of [...x].sort())if(!y.has(v))add(removeCode,removeSeverity,'An entry was removed. Review the cited source; values are omitted from reports.',p+'/'+a.indexOf(v),p,'potential_reduction',v);
   }
   if(format==='claude-settings'){
     const a=before.data.permissions??{},b=after.data.permissions??{};
@@ -74,6 +80,7 @@ export function compare(beforeText,afterText,{format='auto'}={}){
   return {schema_version:'1.0',tool:{name:'MONNA Agent Permission Diff',version:VERSION},format,
     verdict:findings.some(f=>f.severity!=='info')?'review_required':'no_review_level_change_detected',findings,
     coverage:{status:coverage.length?'partial':'supported_fields_only',unsupported_fields:coverage},
+    ...(taskPolicy&&{task_review:{goal_evidence:taskPolicy.goalEvidence,effective_access:'unknown'}}),
     limitations:['Static comparison of two supplied files, not effective permission evaluation.','Managed settings, other configuration layers, runtime flags, server behavior and filesystem links are not resolved.','No server commands, hooks or tools are executed; no network requests are made.','Config values are withheld from reports. Source line locations identify evidence.']};
 }
 export function shouldFail(report,threshold='high'){

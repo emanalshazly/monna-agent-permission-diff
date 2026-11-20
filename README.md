@@ -30,6 +30,21 @@ Outputs: JSON (default), Markdown, SARIF 2.1.0. Exit codes: **0** below your cho
 
 SARIF uses generic `before.json` / `after.json` artifact names to avoid disclosing file paths; stage your files under those names when uploading SARIF. The tool produces SARIF; it does not upload it or automatically comment on pull requests.
 
+## Review changes against a task
+
+```sh
+npm run demo
+node cli.mjs before.json after.json --task task-policy.json --format markdown
+```
+
+The demo compares [before](examples/task-before.json) and [after](examples/task-after.json) against a [list-only task](examples/task-policy.json). The proposed configuration adds a send allow and removes the previous approval rule. The report cites the configuration and policy lines, then suggests removing the send allow and retaining the approval requirement until the capability is excluded.
+
+The optional policy contains a nonblank `goal` and an optional `rules` array. Give each rule its exact configuration text and a `need` of `required`, `approval_required`, or `out_of_scope`. Use a policy reviewed by the task owner. The goal describes the task for that reviewer. Classification uses the explicit rule entries with exact matching.
+
+- Claude allow, ask and deny rule changes are matched to the supplied policy. Unlisted rules, directory and mode changes, and MCP configuration changes show an evidence request and an unknown task need.
+- JSON, Markdown, and SARIF include the task review and source locations. Goals and literal permission rule text stay out of reports.
+- The review is advisory. Configuration findings and the exit threshold control the result. Effective access remains unknown.
+
 ## Supported formats and limits
 
 | Format | Explicitly modeled fields |
@@ -65,6 +80,8 @@ steps:
 The action needs Node 22+ on the runner. It adds the redacted report to the job summary and exposes `report-path`. Input values are passed through environment variables and a shell-free argument array. It checks that file targets remain within the workspace, including symlink resolution. No write token is required. Pinning instructions will accompany the first verified release.
 
 ## Browser demo
+
+**Try the worked example** loads the before and after configurations and task policy. For your own comparison, expand **Task policy (optional)** to enter a policy. The browser fetches the bundled example files from the same host and compares your inputs locally.
 
 The root `index.html` and ES modules are a static site with English/Arabic controls. Run `node preview.mjs` and open `http://127.0.0.1:8432`, or use any static HTTP server; opening the HTML via `file://` may block module imports. Select local files or paste JSON, then compare. Files are read using the browser File API and are not uploaded. Initial site assets are fetched normally; analysis itself makes no network calls. Findings retain stable English rule identifiers and descriptions.
 

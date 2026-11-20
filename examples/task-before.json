@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__mock_inbox__list"
+    ],
+    "ask": [
+      "mcp__mock_inbox__send"
+    ]
+  }
+}
