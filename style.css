@@ -4,3 +4,4 @@
 #taskPanel .task-label{display:block;margin-top:14px}
 #taskPanel textarea{height:200px}
 .finding .task-fit{margin-top:10px;font-weight:650}
+.task-warning{color:#7a2513;font-weight:650}
