@@ -79,6 +79,12 @@ steps:
 
 The action needs Node 22+ on the runner. It adds the redacted report to the job summary and exposes `report-path`. Input values are passed through environment variables and a shell-free argument array. It checks that file targets remain within the workspace, including symlink resolution. No write token is required. Pinning instructions will accompany the first verified release.
 
+The complete Markdown report is retained at `report-path`, including for large
+valid inputs. When it cannot fit in the remaining [GitHub step summary budget](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-commands#step-isolation-and-limits)
+of 1 MiB, the summary uses a short notice instead. Existing summary content is
+preserved. Collect the full report using the returned path; the action does not
+upload it automatically.
+
 ## Browser demo
 
 **Try the worked example** loads the before and after configurations and task policy. For your own comparison, expand **Task policy (optional)** to enter a policy. The browser fetches the bundled example files from the same host and compares your inputs locally.
