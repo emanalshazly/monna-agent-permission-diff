@@ -84,3 +84,17 @@ test('SARIF uses synthetic artifact names and precise evidence coordinates',()=>
 test('seeded irrelevant key reorder property holds over 100 cases',()=>{
   for(let i=0;i<100;i++){const a={mcpServers:{x:{env:{A:String(i),B:'b'},args:['--scope',String(i)]}}};const b={mcpServers:{x:{args:['--scope',String(i)],env:{B:'b',A:String(i)}}}};assert.equal(c(a,b,'mcp').findings.length,0);}
 });
+test('string and number errors cite the offending character, not the end of the token',()=>{
+  const at=(s,line,column)=>assert.throws(()=>parseConfig(s),e=>e instanceof ConfigError&&e.message.endsWith(`at line ${line}, column ${column}.`),s);
+  at('{"a":"x\ty"}',1,8);
+  at('{"a":"\\q"}',1,7);
+  at('{"a":"\\u12G4"}',1,7);
+  at('{"a":"\\u12"}',1,7);
+  at('{"k\u0001":1}',1,4);
+  at('{\n  "a": "open\n  ",\n  "b": 1\n}',2,13);
+  at('{"a": 1e999 }',1,7);
+  at('{\n  "a": -1e400\n}',2,8);
+  assert.throws(()=>parseConfig('{"a":"'+'s3cr3t\t'+'"}'),e=>!e.message.includes('s3cr3t'));
+  const p=parseConfig('{"a":"\\"\\\\\\/\\b\\f\\n\\r\\t\\u00e9\\uD83D\\uDE00","b":-0.5e-3}');
+  assert.equal(p.data.a,'"\\/\b\f\n\r\té😀');assert.equal(p.data.b,-0.0005);
+});

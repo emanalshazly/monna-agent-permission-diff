@@ -15,7 +15,8 @@ export function parseConfig(source) {
   const ws = () => { while(/[\x20\t\r\n]/.test(source[i]??'!'))i++; };
   function str() {
     const start=i++;
-    while(i<source.length){const c=source[i++];if(c==='\\'){i++;continue;}if(c==='"'){try{return JSON.parse(source.slice(start,i));}catch{error('Invalid JSON string');}}}
+    // Report a bad character or escape where it occurs, not after the string ends.
+    while(i<source.length){const at=i,c=source[i++];if(c<'\x20'){i=at;error('Invalid JSON string');}if(c==='\\'){const e=source[i++];if(e==='u'?!/^[0-9a-fA-F]{4}$/.test(source.slice(i,i+4)):!'"\\/bfnrt'.includes(e??'x')){i=at;error('Invalid JSON string');}if(e==='u')i+=4;continue;}if(c==='"')return JSON.parse(source.slice(start,i));}
     error('Unterminated JSON string');
   }
   function value(pointer,depth) {
@@ -28,7 +29,7 @@ export function parseConfig(source) {
     }
     if(c==='['){i++;ws();const arr=[];if(source[i]===']'){i++;return arr;}while(true){arr.push(value(pointer+'/'+arr.length,depth+1));ws();if(source[i]===']'){i++;return arr;}if(source[i++]!==',')error('Expected comma');}}
     const match=/^(?:true|false|null|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?)/.exec(source.slice(i));
-    if(!match)error('Invalid JSON value');i+=match[0].length;const v=JSON.parse(match[0]);if(typeof v==='number'&&!Number.isFinite(v))error('Non-finite number');return v;
+    if(!match)error('Invalid JSON value');const at=i;i+=match[0].length;const v=JSON.parse(match[0]);if(typeof v==='number'&&!Number.isFinite(v)){i=at;error('Non-finite number');}return v;
   }
   const data=value('',0);ws();if(i!==source.length)error('Unexpected trailing content');
   if(!data||typeof data!=='object'||Array.isArray(data))error('Configuration root must be an object');
