@@ -4,8 +4,12 @@ import {compare,shouldFail} from './diff.mjs';
 const shaPattern=/^[a-f0-9]{40}$/;
 const supported=path=>/(^|\/)\.claude\/settings(?:\.local)?\.json$/.test(path)?'claude-settings':/(^|\/)(\.mcp\.json|\.cursor\/mcp\.json)$/.test(path)?'mcp':null;
 const unsupported=path=>/(^|\/)(\.codex\/config\.toml|\.vscode\/mcp\.json|\.claude\/settings(?:\.local)?\.jsonc)$/.test(path);
+// Git's repository-local routing variables override cwd, even for read-only commands.
+const routingVariables=new Set(['GIT_DIR','GIT_WORK_TREE','GIT_IMPLICIT_WORK_TREE','GIT_COMMON_DIR','GIT_OBJECT_DIRECTORY','GIT_ALTERNATE_OBJECT_DIRECTORIES','GIT_INDEX_FILE','GIT_GRAFT_FILE','GIT_SHALLOW_FILE','GIT_PREFIX']);
 function git(cwd,args,maxBuffer=4000000){
- const r=spawnSync('git',['--no-pager','--literal-pathspecs',...args],{cwd,encoding:null,timeout:20000,maxBuffer,env:{...process.env,GIT_OPTIONAL_LOCKS:'0',GIT_TERMINAL_PROMPT:'0'}});
+ const env={...process.env,GIT_OPTIONAL_LOCKS:'0',GIT_TERMINAL_PROMPT:'0'};
+ for(const key of Object.keys(env))if(routingVariables.has(process.platform==='win32'?key.toUpperCase():key))delete env[key];
+ const r=spawnSync('git',['--no-pager','--literal-pathspecs',...args],{cwd,encoding:null,timeout:20000,maxBuffer,env});
  if(r.status!==0||r.error)throw Error('Git objects unavailable or repository limit exceeded. Fetch full PR history and retry.');
  return new TextDecoder('utf-8',{fatal:true}).decode(r.stdout);
 }
