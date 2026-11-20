@@ -1,9 +1,28 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,unlinkSync} from 'node:fs';
+import {mkdtempSync,mkdirSync,writeFileSync,readFileSync,unlinkSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';import {join,dirname,resolve} from 'node:path';import {spawnSync} from 'node:child_process';
 import {reviewPR,prMarkdown} from '../src/pr-review.mjs';
 function fixture(){const cwd=mkdtempSync(join(tmpdir(),'monna-pr-test-'));const git=(...args)=>{const r=spawnSync('git',['-c','user.name=Test','-c','user.email=test@example.invalid','-c','commit.gpgsign=false',...args],{cwd,encoding:'utf8'});assert.equal(r.status,0,r.stderr);return r.stdout.trim();};git('init','--initial-branch=main');const write=(p,text)=>{mkdirSync(dirname(join(cwd,p)),{recursive:true});writeFileSync(join(cwd,p),text);};const commit=()=>{git('add','.');git('commit','--allow-empty','-m','fixture');return git('rev-parse','HEAD');};write('README.md','fixture');const base=commit();return {cwd,git,write,commit,base};}
 const opts=(f,base,head)=>({cwd:f.cwd,base,head,repository:'example/project'});
+
+test('PR artifacts preserve their event input and previous report',t=>{
+ const f=fixture();t.after(()=>rmSync(f.cwd,{recursive:true,force:true}));
+ f.write('.claude/settings.json','{"permissions":{"allow":["FICTIONAL_RULE"]}}');
+ const head=f.commit(),event=join(f.cwd,'monna-pr-review.json');
+ const input=JSON.stringify({pull_request:{base:{sha:f.base,repo:{full_name:'example/project'}},head:{sha:head}}});
+ writeFileSync(event,input);
+ function run(name){
+  const output=join(f.cwd,name+'.output');
+  const result=spawnSync(process.execPath,[resolve('pr-runner.mjs')],{encoding:'utf8',env:{...process.env,
+   GITHUB_WORKSPACE:f.cwd,RUNNER_TEMP:f.cwd,GITHUB_REPOSITORY:'example/project',GITHUB_EVENT_NAME:'pull_request',
+   GITHUB_EVENT_PATH:event,GITHUB_OUTPUT:output,GITHUB_STEP_SUMMARY:''}});
+  assert.equal(result.status,1,result.stderr);
+  return readFileSync(output,'utf8').split('\n')[0].slice('report-path='.length);
+ }
+ const first=run('first');assert.equal(readFileSync(event,'utf8'),input);
+ const report=readFileSync(first,'utf8');assert.match(report,/ALLOW_ADDED/);assert.ok(!report.includes('FICTIONAL_RULE'));
+ const second=run('second');assert.notEqual(second,first);assert.equal(readFileSync(first,'utf8'),report);
+});
 test('PR discovers added config, creates empty baseline and actionable exact links',()=>{const f=fixture();f.write('.claude/settings.json','{\n"permissions":{"allow":["Bash(*)"]}\n}');const head=f.commit();const r=reviewPR(opts(f,f.base,head));assert.equal(r.exitCode,1);assert.equal(r.files[0].beforePresent,false);const md=prMarkdown(r);assert.match(md,/ALLOW_ADDED/);assert.match(md,/Why review:/);assert.match(md,/Action:/);assert.match(md,/synthetic empty baseline/);assert.ok(md.includes(`/blob/${head}/.claude/settings.json#L2`));assert.ok(!md.includes('Bash(*)'));});
 test('PR deletion detects removed approval and deny rules',()=>{const f=fixture();f.write('.claude/settings.json','{"permissions":{"deny":["Read"],"ask":["Bash"]}}');const base=f.commit();unlinkSync(join(f.cwd,'.claude/settings.json'));const r=reviewPR(opts(f,base,f.commit()));assert.deepEqual(r.files[0].report.findings.map(x=>x.code),['DENY_REMOVED','ASK_REMOVED']);assert.match(prMarkdown(r),/file removed/);});
 test('PR uses merge base rather than unrelated changes added to base branch',()=>{const f=fixture();f.git('checkout','-b','proposal');f.write('.claude/settings.json','{"permissions":{"allow":["Write"]}}');const head=f.commit();f.git('checkout','main');f.write('.mcp.json','{"mcpServers":{"other":{"command":"node"}}}');const base=f.commit();const r=reviewPR(opts(f,base,head));assert.equal(r.mergeBase,f.base);assert.equal(r.files.length,1);assert.equal(r.files[0].path,'.claude/settings.json');});
