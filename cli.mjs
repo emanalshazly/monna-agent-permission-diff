@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { open } from 'node:fs/promises';
+import { constants } from 'node:fs';
 import { compare,shouldFail } from './src/diff.mjs';
 import { ConfigError } from './src/json.mjs';
 import { markdown,sarif } from './src/report.mjs';
 async function read(path){
-  let handle;try{handle=await open(path,'r');const stat=await handle.stat();if(!stat.isFile()||stat.size>2000000)throw new ConfigError('Input must be a regular file under 2000000 bytes.');const bytes=Buffer.alloc(2000001);let total=0;while(total<bytes.length){const {bytesRead}=await handle.read(bytes,total,bytes.length-total,null);if(!bytesRead)break;total+=bytesRead;}if(total>2000000)throw new ConfigError('Input exceeds byte limit.');try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes.subarray(0,total));}catch{throw new ConfigError('Input must be valid UTF-8.');}}finally{await handle?.close();}
+  // A blocking FIFO open never reaches the regular-file check below.
+  let handle;try{handle=await open(path,constants.O_RDONLY | (constants.O_NONBLOCK ?? 0));const stat=await handle.stat();if(!stat.isFile()||stat.size>2000000)throw new ConfigError('Input must be a regular file under 2000000 bytes.');const bytes=Buffer.alloc(2000001);let total=0;while(total<bytes.length){const {bytesRead}=await handle.read(bytes,total,bytes.length-total,null);if(!bytesRead)break;total+=bytesRead;}if(total>2000000)throw new ConfigError('Input exceeds byte limit.');try{return new TextDecoder('utf-8',{fatal:true}).decode(bytes.subarray(0,total));}catch{throw new ConfigError('Input must be valid UTF-8.');}}finally{await handle?.close();}
 }
 try{
   const args=process.argv.slice(2);
