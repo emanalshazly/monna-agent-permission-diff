@@ -30,6 +30,21 @@ Outputs: JSON (default), Markdown, SARIF 2.1.0. Exit codes: **0** below your cho
 
 SARIF uses generic `before.json` / `after.json` artifact names to avoid disclosing file paths; stage your files under those names when uploading SARIF. The tool produces SARIF; it does not upload it or automatically comment on pull requests.
 
+## Review changes against a task
+
+```sh
+npm run demo
+node cli.mjs before.json after.json --task task-policy.json --format markdown
+```
+
+The demo compares [before](examples/task-before.json) and [after](examples/task-after.json) against a [list-only task](examples/task-policy.json). The proposed configuration adds a send allow and removes the previous approval rule. The report cites the configuration and policy lines, then suggests removing the send allow and retaining the approval requirement until the capability is excluded.
+
+The optional policy contains a nonblank `goal` and an optional `rules` array. Give each rule its exact configuration text and a `need` of `required`, `approval_required`, or `out_of_scope`. Use a policy reviewed by the task owner. The goal describes the task for that reviewer. Classification uses the explicit rule entries with exact matching.
+
+- Claude allow, ask and deny rule changes are matched to the supplied policy. Unlisted rules, directory and mode changes, and MCP configuration changes show an evidence request and an unknown task need.
+- JSON, Markdown, and SARIF include the task review and source locations. Goals and literal permission rule text stay out of reports.
+- The review is advisory. Configuration findings and the exit threshold control the result. Effective access remains unknown.
+
 ## Supported formats and limits
 
 | Format | Explicitly modeled fields |
@@ -66,18 +81,30 @@ The action needs Node 22+ on the runner. It adds the redacted report to the job 
 
 ## Browser demo
 
+**Try the worked example** loads the before and after configurations and task policy. For your own comparison, expand **Task policy (optional)** to enter a policy. The browser fetches the bundled example files from the same host and compares your inputs locally.
+
 The root `index.html` and ES modules are a static site with English/Arabic controls. Run `node preview.mjs` and open `http://127.0.0.1:8432`, or use any static HTTP server; opening the HTML via `file://` may block module imports. Select local files or paste JSON, then compare. Files are read using the browser File API and are not uploaded. Initial site assets are fetched normally; analysis itself makes no network calls. Findings retain stable English rule identifiers and descriptions.
 
 ## Verification and comparison
 
 Read the [executed three-alternative comparison](docs/THREE-ALTERNATIVE-REVIEW.md), including pinned competitor versions, synthetic fixtures, raw results and competitor strengths. These scoped checks are not an overall security ranking.
 
-Browser export buttons also reveal copyable report text. Automated browser checks did not confirm a completed file download; use the text fallback or CLI output if downloads are blocked.
+Browser export buttons also reveal copyable report text. The optional Chromium tests below save completed Markdown and SARIF downloads, inspect their bytes in both English and Arabic, and check the copyable-text fallback when browser downloads are refused. Use that fallback or CLI output if downloads are blocked.
 
 ```sh
 node --test
 node benchmark/run.mjs
 ```
+
+To run the browser checks, install the development-only test dependency with [Bun](https://bun.sh), then its Chromium browser:
+
+```sh
+bun install --frozen-lockfile
+bunx playwright install chromium
+bun run test:browser
+```
+
+Node 22+ must also be on PATH. On Linux, use `bunx playwright install --with-deps chromium` if browser system dependencies are missing. The test runner starts and stops `node preview.mjs`; port 8432 must be free. Eight tests exercise fictional Claude settings, supported MCP environment changes, and explicit-format unsupported-field redaction; they verify stable rule IDs, SARIF 2.1.0 results, coverage labels, canary absence, and copyable text with downloads enabled and refused. Completed files are saved under ignored `test-results/` directories for inspection. This verifies local Chromium behavior, not other browsers, GitHub SARIF ingestion or effective permissions. Normal CLI and browser-demo use still need no dependency installation.
 
 The suite covers malformed input, line evidence, permission changes, credential canaries, CLI behavior, GitHub summaries and deterministic comparisons. The benchmark is a small synthetic suite, not independent validation or proof of market superiority. See [comparison evidence](docs/COMPARISON.md) and [quality gates](docs/QUALITY.md).
 
